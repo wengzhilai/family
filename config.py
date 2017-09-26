@@ -11,8 +11,7 @@ OPENID_PROVIDERS = [
     { 'name': 'Flickr', 'url': 'http://www.flickr.com/<username>' },
     { 'name': 'MyOpenID', 'url': 'https://www.myopenid.com' }]
     
-# SQLALCHEMY_DATABASE_URI = 'mssql+pymssql://sa:sa@192.168.0.110:1433/Tmp'
-SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://FA:FA@139.129.194.140:3306/FA'
+
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = False
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
