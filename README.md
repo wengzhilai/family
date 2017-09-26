@@ -31,3 +31,6 @@ pip install flipflop
 pip install coverage
 
 pip install pymssql
+pip install PyMySQL
+SQLALCHEMY_DATABASE_URI = 'mssql+pymssql://sa:sa@192.168.0.110:1433/Tmp'
+SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://FA:FA@139.129.194.140:3306/FA'

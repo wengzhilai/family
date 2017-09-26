@@ -7,7 +7,7 @@ from app import db
 from flask_login import UserMixin
 import datetime
 class User(db.Model,UserMixin):
-    __tablename__ = 'YL_USER'
+    __tablename__ = 'FA_USER'
     ID = db.Column(db.Integer, primary_key=True)
     NAME = db.Column(db.String)
     LOGIN_NAME = db.Column(db.String)
