@@ -141,7 +141,7 @@
             "name": "Flask (old)",
             "type": "python",
             "request": "launch",
-            "stopOnEntry": false,
+            "stopOnEntry":false,
             "pythonPath": "${config:python.pythonPath}",
             "program": "${workspaceRoot}/run.py",
             "cwd": "${workspaceRoot}",

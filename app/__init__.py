@@ -12,9 +12,6 @@ db = SQLAlchemy(app)
 app.secret_key="超级认证字符"
 
 
- 
-
-
 login_manager = LoginManager()
 login_manager.login_view = "auth.logout"
 login_manager.session_protection = "strong"

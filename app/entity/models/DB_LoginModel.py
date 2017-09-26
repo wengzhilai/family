@@ -3,7 +3,8 @@
 '''
 from app import db
 
-class Db_LoginModel(object):
+class LOGIN(db.Model):
+    '''user 用户'''
     __tablename__ = 'FA_LOGIN'
     ID = db.Column(db.Integer, primary_key=True)
     LOGIN_NAME = db.Column(db.String)
