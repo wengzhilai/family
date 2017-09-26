@@ -1,21 +1,22 @@
 # file: example1.py
 '''首页'''
+from app.core.Fun import Fun
 from app import auth, login_manager
 from flask import json, request, flash
-from app.dbModel.dal.UserDal import UserDal
+from app.entity.dal.UserDal import UserDal
 from flask_login import (LoginManager, login_required, login_user,
                             current_user, logout_user, UserMixin)
-from app.dbModel.models.DB_UserModel import User
+from app.entity.models.DB_UserModel import USER
 from app.core.model.AppReturnDTO import AppReturnDTO
-from app.core.Fun import Fun
 from app.core.model.LogingModel import LogingModel
+from app.core.AlchemyEncoder import AlchemyEncoder
 
 
 @login_manager.user_loader
 def load_user(user_id):
     ''' 获取用户信息 '''
-    user = UserDal.SingleUser(user_id)
-    return user
+    user = UserDal.single_user(user_id)
+    return json.dumps(Fun.convert_to_dict(user), ensure_ascii=False)
 
 @auth.route('/token', methods=['GET', 'POST'])
 def token():
@@ -52,8 +53,8 @@ def logout():
 def user_login():
     '''用户登录'''
     j_data = json.loads(request.get_data())#-----load将字符串解析成json
-    (err, ent) = UserDal.UserLogin(j_data)
+    (err, ent) = UserDal.user_login(j_data)
     if err.IsSuccess:
-        return json.dumps(Fun.convert_to_dict(ent))
+        return json.dumps(ent, cls=AlchemyEncoder)
     else:
-        return json.dumps(Fun.convert_to_dict(err))
+        return json.dumps(err, cls=AlchemyEncoder)
