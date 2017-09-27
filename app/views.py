@@ -1,20 +1,30 @@
 # file: example1.py
 '''首页'''
+import hashlib
 import app.core.Fun
 from app import app, auth
 from flask_login import login_required
+from flask import make_response, request, g
+from functools import wraps
 
-@app.route('/')
-@app.route('/index')
+
+
+tokens = {
+    "secret-token-1": "john",
+    "secret-token-2": "susan"
+}
+
+@auth.verify_token
+def verify_token(token):
+    print('verify_token')
+    print(token)
+    if token in tokens:
+        g.current_user = tokens[token]
+        return True
+    return False
+
+
+@app.route('/', methods=['GET', 'POST'])
+@auth.login_required
 def index():
-    ''' 首页 '''
-    return 'json.dumps(user, cls=AlchemyEncoder)'
-
-# test method
-@app.route('/index/test')
-@login_required
-def test():
-    '''测试'''
-    print('current_user.NAME')
-    return 'Logged in as: '
-
+    return "Hello, %s!" % 22

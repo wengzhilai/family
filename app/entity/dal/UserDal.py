@@ -16,15 +16,18 @@ class UserDal(object):
         
         login=db_model.Login.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
         user=db_model.User.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
-        login=db_model.Login
-        user=db_model.User
+        # login=db_model.Login
+        # user=db_model.User
         if user is None or login is None:
             return AppReturnDTO(True, "用户名有误")
 
         if login.PASSWORD != hashlib.md5(in_ent.passWord.encode('utf-8')).hexdigest():
             return AppReturnDTO(True, "密码有误")
-        return AppReturnDTO(True, "登录成功",user)
+        token=login.generate_auth_token()
+        token=login.generate_auth_token().decode('utf-8')
+        return AppReturnDTO(True, "登录成功",user,token)
 
+        
     @staticmethod
     def single_user(userId):
         user=db_model.User.query.filter_by(ID=userId).first();

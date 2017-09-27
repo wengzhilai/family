@@ -2,6 +2,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 CSRF_ENABLED = True
+# Flask-WTF 使用这个密钥生成加密令牌
 SECRET_KEY = 'you-will-never-guess'
 
 OPENID_PROVIDERS = [
