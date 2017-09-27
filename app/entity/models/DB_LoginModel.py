@@ -1,8 +1,10 @@
 '''
 使用账号
 '''
-from itsdangerous import TimedJSONWebSignatureSerializer as Serializer, SignatureExpired, BadSignature
-from app import db,app
+from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
+                          SignatureExpired, BadSignature)
+from app import db, app
+from app.core.model.AppReturnDTO import AppReturnDTO
 
 class LOGIN(db.Model):
     '''user 用户'''
@@ -19,25 +21,27 @@ class LOGIN(db.Model):
     LOCKED_REASON = db.Column(db.String)
     FAIL_COUNT = db.Column(db.Integer)
 
-    def generate_auth_token(self, expiration = 600):
-        s = Serializer(app.config['SECRET_KEY'], expires_in = expiration)
-        return s.dumps({ 'ID': self.ID })
+    def generate_auth_token(self, expiration=600):
+        '''获取用户的token'''
+        ser = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
+        return ser.dumps({'ID':self.ID})
 
     @staticmethod
     def verify_auth_token(token):
-        s = Serializer(app.config['SECRET_KEY'])
+        '''根据token获取用户'''
+        ser = Serializer(app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            data = ser.loads(token)
         except SignatureExpired:
-            return None # valid token, but expired
+            return AppReturnDTO(False, "token已经过期"), None # valid token, but expired
         except BadSignature:
-            return None # invalid token
+            return AppReturnDTO(False, "token无效"), None # invalid token
         user = LOGIN.query.filter_by(ID=data['ID'])
-        return user
+        return AppReturnDTO(True), user
 
     def can(self, permission):
         '''判断用户是否具备某权限'''
-        return True
+        return True, permission
 
     def is_adminstractor(self):
         '''判断用户是否具备管理员权限'''
