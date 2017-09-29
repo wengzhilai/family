@@ -32,11 +32,15 @@ class LOGIN(db.Model):
         ser = Serializer(app.config['SECRET_KEY'])
         try:
             data = ser.loads(token)
+            user = LOGIN.query.filter_by(ID=data['ID']).first()
         except SignatureExpired:
             return AppReturnDTO(False, "token已经过期"), None # valid token, but expired
         except BadSignature:
             return AppReturnDTO(False, "token无效"), None # invalid token
-        user = LOGIN.query.filter_by(ID=data['ID'])
+        except BaseException:
+            return AppReturnDTO(False, "错误"), None
+        if user is None:
+            return AppReturnDTO(False, "用户不存在"), None
         return AppReturnDTO(True), user
 
     def can(self, permission):

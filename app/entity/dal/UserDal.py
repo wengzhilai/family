@@ -25,7 +25,7 @@ class UserDal(object):
             return AppReturnDTO(True, "密码有误")
         token = login.generate_auth_token()
         token = login.generate_auth_token().decode('utf-8')
-        return AppReturnDTO(True, "登录成功",user,token)
+        return AppReturnDTO(True, "登录成功", user, token)
 
     @staticmethod
     def verify_auth_token(token):
@@ -34,7 +34,7 @@ class UserDal(object):
 
     @staticmethod
     def single_user(userId):
-        user=db_model.User.query.filter_by(ID=userId).first();
+        user=db_model.User.query.filter_by(ID=userId).first()
         return user
 
     @staticmethod

@@ -22,4 +22,4 @@ def verify_token(token):
 @app.route('/', methods=['GET', 'POST'])
 @auth.login_required
 def index():
-    return "Hello, %s!" % 22
+    return "Hello, %s!" % g.current_user.ID
