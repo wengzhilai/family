@@ -6,6 +6,11 @@ from app.core.model.LogingModel import LogingModel
 from app.core.model.AppReturnDTO import AppReturnDTO
 from app.core.Fun import Fun
 from config import PASSWORD_COMPLEXITY, VERIFY_CODE
+from sqlalchemy import or_, and_, create_engine
+from app import db
+from app.entity.models.DB_UserModel import USER
+
+
 class UserDal(object):
     '''用户业务处理'''
     @staticmethod
@@ -52,13 +57,14 @@ class UserDal(object):
             return AppReturnDTO(False, "密码复杂度不够")
 
         if VERIFY_CODE:
-            user = db_model.User.query.filter_by(and_(PHONE_NO=in_ent.loginName, CONTENT=in_ent.code)).first();
+            user = db_model.User.query.filter_by(and_(PHONE_NO=in_ent.loginName, CONTENT=in_ent.code)).first()
         return user
 
     @staticmethod
     def single_user(userId):
         '''查询一用户'''
-        user=db_model.User.query.filter_by(ID=userId);
+        user=db.Query(USER).all()
+        # user=db_model.User.query.filter_by(LAST_LOGIN_TIME='2017-06-01T20:42:46',DISTRICT_ID=1,NAME='翁应吉').all()
         return user
 
     # @staticmethod

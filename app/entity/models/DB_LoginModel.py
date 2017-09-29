@@ -21,7 +21,7 @@ class LOGIN(db.Model):
     LOCKED_REASON = db.Column(db.String)
     FAIL_COUNT = db.Column(db.Integer)
 
-    def generate_auth_token(self, expiration=600):
+    def generate_auth_token(self, expiration=60000):
         '''获取用户的token'''
         ser = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
         return ser.dumps({'ID':self.ID})
