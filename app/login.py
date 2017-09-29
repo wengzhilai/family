@@ -8,49 +8,13 @@ from flask_login import (LoginManager, login_required, login_user,
                             current_user, logout_user, UserMixin)
 from app.entity.models.DB_UserModel import USER
 from app.core.model.AppReturnDTO import AppReturnDTO
-from app.core.model.LogingModel import LogingModel
 from app.core.AlchemyEncoder import AlchemyEncoder
 
-@login_manager.user_loader
-def load_user(user_id):
-    ''' 获取用户信息 '''
-    user = UserDal.single_user(user_id)
-    return json.dumps(Fun.convert_to_dict(user), ensure_ascii=False)
-
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token()
-    return jsonify({ 'token': token.decode('ascii') })
-
-@app.route('/token', methods=['GET', 'POST'])
-def token():
-    '''用户登录'''
-    # user = User()
-    # login_user(user)
-    print(request.data)
-    a = request.get_data()
-    print(a)
-    j_data =  json.loads(a) #-----load将字符串解析成json
-
-    class MyClass(object):
-        loginName="1"
-        password=""
-    myclass=MyClass()
-    myclass.__dict__=j_data;
-
-    print('JSON:')
-    print(myclass.loginName)
-    print(myclass.password)
-    re_ent = AppReturnDTO(False, '登录超时')
-    json_str = Fun.convert_to_dict(re_ent)
-    re_str = json.dumps(json_str, ensure_ascii=False)
-    return re_str
 
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     '''退出登录'''
-    flash(u'You have been signed out')
-    re_ent = AppReturnDTO(False, U'登录超时')
+    re_ent = UserDal.login_out()
     return json.dumps(Fun.convert_to_dict(re_ent))
 
 @app.route('/auth/UserLogin', methods=['GET', 'POST'])

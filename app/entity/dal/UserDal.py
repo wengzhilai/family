@@ -1,9 +1,11 @@
 '''用户业务处理'''
 import hashlib
-from app import db
 from app.entity.dbModel import db_model
+from sqlalchemy import and_
 from app.core.model.LogingModel import LogingModel
 from app.core.model.AppReturnDTO import AppReturnDTO
+from app.core.Fun import Fun
+from config import PASSWORD_COMPLEXITY, VERIFY_CODE
 class UserDal(object):
     '''用户业务处理'''
     @staticmethod
@@ -19,13 +21,18 @@ class UserDal(object):
         # login=db_model.Login
         # user=db_model.User
         if user is None or login is None:
-            return AppReturnDTO(True, "用户名有误")
+            return AppReturnDTO(False, "用户名有误")
 
         if login.PASSWORD != hashlib.md5(in_ent.passWord.encode('utf-8')).hexdigest():
-            return AppReturnDTO(True, "密码有误")
+            return AppReturnDTO(False, "密码有误")
         token = login.generate_auth_token()
         token = login.generate_auth_token().decode('utf-8')
-        return AppReturnDTO(True, "登录成功", user, token)
+        return AppReturnDTO(True, "登录成功",user,token)
+    
+    @staticmethod
+    def login_out():
+        '''退出登录'''
+        return AppReturnDTO(True)
 
     @staticmethod
     def verify_auth_token(token):
@@ -33,19 +40,29 @@ class UserDal(object):
         return db_model.Login.verify_auth_token(token)
 
     @staticmethod
-    def single_user(userId):
-        user=db_model.User.query.filter_by(ID=userId).first()
+    def login_reg(_inent):
+        '''注册用户'''
+        in_ent = LogingModel()
+        in_ent.__dict__ = _inent
+        if in_ent.loginName is None or in_ent.loginName=='':
+            return AppReturnDTO(False, "电话号码不能为空")
+        if not Fun.is_phonenum(in_ent.loginName):
+            return AppReturnDTO(False, "电话号码格式不正确")
+        if Fun.password_complexity(in_ent.passWord) < PASSWORD_COMPLEXITY:
+            return AppReturnDTO(False, "密码复杂度不够")
+
+        if VERIFY_CODE:
+            user = db_model.User.query.filter_by(and_(ADD_TIME='', PHONE_NO=in_ent.loginName, CONTENT=in_ent.code)).first();
         return user
 
-    @staticmethod
-    def GetAll():
-        user=db_model.User.query.all()
-        return user 
+    # @staticmethod
+    # def single_user(userId):
+    #     user=db_model.User.query.filter_by(ID=userId).first();
+    #     return user
 
-    @staticmethod
-    def AddEnt(name):
-        user=User()
-        user.DISTRICT_ID=1
-        user.NAME=name
-        db.session.add(user)
-        return user 
+    # @staticmethod
+    # def GetAll():
+    #     user=db_model.User.query.all()
+    #     return user 
+
+ 

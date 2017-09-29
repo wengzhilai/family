@@ -1,4 +1,6 @@
 '''静态类'''
+import re
+
 class Fun(object):
     '''静态方法'''
     @staticmethod
@@ -40,4 +42,27 @@ class Fun(object):
             re_dict = {}
             re_dict.update(obj.__dict__)
             return re_dict
-        
+
+    @staticmethod
+    def is_phonenum(phone_num):
+        '''检测电否为电话号码'''
+        rep = re.compile(r'^0\d{2,3}\d{7,8}$|^1[358]\d{9}$|^147\d{8}')
+        phonematch = rep.match(phone_num)
+        if phonematch:
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def password_complexity(passwd):
+        '''检测密码复杂度'''
+        _re_int = 0
+        if re.match(r'^(?=.*[a-z])$', passwd):
+            _re_int += 1
+        if re.match(r'^(?=.*[A-Z])$', passwd):
+            _re_int += 1
+        if re.match(r'^(?=.*[0-9])$', passwd):
+            _re_int += 1
+        if re.match(r'^(?=([\x21-\x7e]+)[^a-zA-Z0-9])$', passwd):
+            _re_int += 1
+        return _re_int
