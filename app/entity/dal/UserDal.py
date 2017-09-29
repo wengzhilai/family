@@ -52,13 +52,14 @@ class UserDal(object):
             return AppReturnDTO(False, "密码复杂度不够")
 
         if VERIFY_CODE:
-            user = db_model.User.query.filter_by(and_(ADD_TIME='', PHONE_NO=in_ent.loginName, CONTENT=in_ent.code)).first();
+            user = db_model.User.query.filter_by(and_(PHONE_NO=in_ent.loginName, CONTENT=in_ent.code)).first();
         return user
 
-    # @staticmethod
-    # def single_user(userId):
-    #     user=db_model.User.query.filter_by(ID=userId).first();
-    #     return user
+    @staticmethod
+    def single_user(userId):
+        '''查询一用户'''
+        user=db_model.User.query.filter_by(ID=userId);
+        return user
 
     # @staticmethod
     # def GetAll():

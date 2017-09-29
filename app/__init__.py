@@ -23,5 +23,6 @@ login_manager.login_message_category = "info"
 login_manager.init_app(app)
 from app import views 
 from app import login 
+from app import user 
 
 # app.register_blueprint(auth, url_prefix='/auth')
