@@ -9,7 +9,7 @@ from config import PASSWORD_COMPLEXITY, VERIFY_CODE
 from sqlalchemy import or_, and_, create_engine
 from app import db
 from app.entity.models.DB_UserModel import USER
-
+import datetime
 
 class UserDal(object):
     '''用户业务处理'''
@@ -63,10 +63,11 @@ class UserDal(object):
     @staticmethod
     def single_user(userId):
         '''查询一用户'''
-        user=db.Query(USER).all()
-        # user=db_model.User.query.filter_by(LAST_LOGIN_TIME='2017-06-01T20:42:46',DISTRICT_ID=1,NAME='翁应吉').all()
+        # user=db.Query(USER).all()
+        # user=db_model.User.query.filter_by(ID=1).all()
+        now_time=datetime.datetime.now()
+        user = db.session.query(db_model.User).filter(db_model.User.CREATE_TIME > now_time ).all()
         return user
-
     # @staticmethod
     # def GetAll():
     #     user=db_model.User.query.all()
