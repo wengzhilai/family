@@ -1,4 +1,5 @@
-from flask import Flask,Blueprint
+'''doc '''
+from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_cors import CORS

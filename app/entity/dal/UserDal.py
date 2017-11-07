@@ -55,9 +55,18 @@ class UserDal(object):
             return AppReturnDTO(False, "电话号码格式不正确")
         if Fun.password_complexity(in_ent.passWord) < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够")
-
-        if VERIFY_CODE:
-            user = db_model.User.query.filter_by(and_(PHONE_NO=in_ent.loginName, CONTENT=in_ent.code)).first()
+        now_time=datetime.datetime.now()
+        # if VERIFY_CODE:
+        #     
+        #     _sms_count = db.session.query(db_model.SmsSend).filter(
+        #         db_model.SmsSend.ADD_TIME < now_time, 
+        #         db_model.SmsSend.PHONE_NO==in_ent.loginName,
+        #         db_model.SmsSend.CONTENT==in_ent.code
+        #         ).count()
+        #     if _sms_count==0:
+        #         return AppReturnDTO(False, "验证码错误")
+        
+        user = db.session.query(db_model.User).filter(db_model.User.CREATE_TIME > now_time ).all()
         return user
 
     @staticmethod
@@ -66,7 +75,7 @@ class UserDal(object):
         # user=db.Query(USER).all()
         # user=db_model.User.query.filter_by(ID=1).all()
         now_time=datetime.datetime.now()
-        user = db.session.query(db_model.User).filter(db_model.User.CREATE_TIME > now_time ).all()
+        user = db.session.query(db_model.User).filter(db_model.User.CREATE_TIME < now_time ).all()
         return user
     # @staticmethod
     # def GetAll():

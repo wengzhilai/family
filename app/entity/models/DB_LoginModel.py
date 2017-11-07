@@ -5,7 +5,6 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
                           SignatureExpired, BadSignature)
 from app import db, app
 from app.core.model.AppReturnDTO import AppReturnDTO
-
 class LOGIN(db.Model):
     '''user 用户'''
     __tablename__ = 'FA_LOGIN'

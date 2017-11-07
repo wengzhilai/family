@@ -57,7 +57,7 @@ class Fun(object):
     def password_complexity(passwd):
         '''检测密码复杂度'''
         _re_int = 0
-        if re.match(r'^(?=.*[a-z])$', passwd):
+        if re.match('^[a-z]+$', passwd):
             _re_int += 1
         if re.match(r'^(?=.*[A-Z])$', passwd):
             _re_int += 1

@@ -12,7 +12,7 @@ class LogingModel(object):
         # 登录名
         # </summary>
         # [Required, MaxLength(20)]
-        loginName=None
+        loginName=''
         # <summary>
         # 密码
         # </summary>
