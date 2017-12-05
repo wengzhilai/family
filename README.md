@@ -12,6 +12,7 @@ The sqlite database must also be created before the application can run, and the
 
 Running
 -------
+virtualenv --no-site-packages venv
 
 To run the application in the development web server just execute `run.py` with the Python interpreter from the flask virtual environment.
 
@@ -32,7 +33,7 @@ pip install coverage
 
 pip install pymssql
 pip install PyMySQL
-
-
+pip3 install -U flask-cors
+pip3 install flask-httpauth
 git remote remove origin
 git remote add origin https://github.com/wengzhilai/family
