@@ -1,4 +1,4 @@
-# file: example1.py
+# file: view.py
 '''首页'''
 import app.core.Fun
 from app import app, auth

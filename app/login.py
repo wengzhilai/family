@@ -1,4 +1,4 @@
-# file: example1.py
+# file: login.py
 '''首页'''
 from app.core.Fun import Fun
 from app import auth, login_manager, app

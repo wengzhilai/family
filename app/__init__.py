@@ -21,6 +21,7 @@ login_manager.session_protection = "strong"
 login_manager.login_message = "Please login to access this page."
 login_manager.login_message_category = "info"
 
+
 login_manager.init_app(app)
 from app import views 
 from app import login 
