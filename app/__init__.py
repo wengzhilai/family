@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''__init__.py '''
 from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
