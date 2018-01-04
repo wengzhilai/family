@@ -22,8 +22,7 @@ def logout():
 @app.route('/auth/UserLogin', methods=['GET', 'POST'])
 def user_login():
     '''用户登录'''
-    tmp = request.get_data()
-    j_data = json.loads(tmp)  # -----load将字符串解析成json
+    j_data = request.json  # -----load将字符串解析成json
     print(j_data)
     ent = UserDal.user_login(j_data)
     print(ent.__dict__)
