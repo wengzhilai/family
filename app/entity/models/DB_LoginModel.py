@@ -7,7 +7,7 @@ from app import db, app
 from app.core.model.AppReturnDTO import AppReturnDTO
 class LOGIN(db.Model):
     '''user 用户'''
-    __tablename__ = 'FA_LOGIN'
+    __tablename__ = 'fa_login'
     ID = db.Column(db.Integer, primary_key=True)
     LOGIN_NAME = db.Column(db.String)
     PASSWORD = db.Column(db.String)

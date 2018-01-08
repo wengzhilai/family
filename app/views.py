@@ -44,11 +44,14 @@ def show_post(post_id):
 
 @app.route('/projects/', methods=['GET', 'POST'])
 def projects():
-    p = request.get_data()
+    h = request.headers
+    j = request.json
+    b = request.get_data()
 
-    j_data = json.loads(p,True)#-----load将字符串解析成json
+    j_data = json.loads(str(b, encoding = "utf-8"))#-----load将字符串解析成json
+    
     # print(j_data)
-    return 'j_data'
+    return j.__str__()
 
 
 @app.route('/about')
