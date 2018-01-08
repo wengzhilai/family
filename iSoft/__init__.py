@@ -13,8 +13,7 @@ CORS(app)
 auth = HTTPTokenAuth(scheme='Bearer')
 app.config.from_object('config')
 db = SQLAlchemy(app)
-app.secret_key="超级认证字符"
-
+app.secret_key = "超级认证字符"
 
 login_manager = LoginManager()
 login_manager.login_view = "auth.logout"
@@ -22,11 +21,6 @@ login_manager.session_protection = "strong"
 login_manager.login_message = "Please login to access this page."
 login_manager.login_message_category = "info"
 
-
 login_manager.init_app(app)
-from app import views 
-from app import login 
-from app import user 
-from app import role 
 
-# app.register_blueprint(auth, url_prefix='/auth')
+from iSoft import views, login, user, role

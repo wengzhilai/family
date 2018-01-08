@@ -44,4 +44,4 @@ https://github.com/	wengzhilai	wengzhilai123
 pip install mysql-python
 source /home/soft/flask-sqlacodegen/venv/bin/activate
 deactivate
-flask-sqlacodegen --noviews --noindexes --outfile ~/github/family/app/entity/models.py mysql://FA:abcdef123@47.254.16.126:3306/fa
+python ./sqlacodegen/main.py --noviews --noindexes --flask --outfile ~/github/family/app/entity/model.py mysql://FA:abcdef123@47.254.16.126:3306/fa
