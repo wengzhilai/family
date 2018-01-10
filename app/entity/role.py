@@ -1,3 +1,6 @@
+'''
+角色
+'''
 from app.entity.model import FaRole
 
 class RoleDal(object):

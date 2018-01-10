@@ -1,5 +1,6 @@
 '''静态类'''
 import re
+import json
 
 class Fun(object):
     '''静态方法'''
@@ -43,6 +44,13 @@ class Fun(object):
             re_dict.update(obj.__dict__)
             return re_dict
 
+
+    @staticmethod
+    def class_to_JsonStr(obj):
+        '''把对类转成JSon字符串'''
+        return json.dumps(Fun.convert_to_dict(obj), ensure_ascii=False)
+
+
     @staticmethod
     def is_phonenum(phone_num):
         '''检测电否为电话号码'''
@@ -57,12 +65,12 @@ class Fun(object):
     def password_complexity(passwd):
         '''检测密码复杂度'''
         _re_int = 0
-        if re.match('^[a-z]+$', passwd):
+        if re.match(r'^.*[a-z]+.*$', passwd) is not None:
             _re_int += 1
-        if re.match(r'^(?=.*[A-Z])$', passwd):
+        if re.match(r'^.*[A-Z]+.*$', passwd) is not None:
             _re_int += 1
-        if re.match(r'^(?=.*[0-9])$', passwd):
+        if re.match(r'^.*\d+.*$', passwd) is not None:
             _re_int += 1
-        if re.match(r'^(?=([\x21-\x7e]+)[^a-zA-Z0-9])$', passwd):
+        if re.match(r'^.*(?=([\x21-\x7e]+)[^a-zA-Z0-9]).*$', passwd) is not None:
             _re_int += 1
         return _re_int

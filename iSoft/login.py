@@ -22,18 +22,21 @@ def logout():
 @app.route('/auth/UserLogin', methods=['GET', 'POST'])
 def user_login():
     '''用户登录'''
-    j_data = request.json  # -----load将字符串解析成json
-    print(j_data)
+    j_data = request.json 
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+
     ent = UserDal.user_login(j_data)
-    print(ent.__dict__)
-    # return json.dumps(ent, cls=AlchemyEncoder)
-    return json.dumps(Fun.convert_to_dict(ent), ensure_ascii=False)
+    return Fun.class_to_JsonStr(ent)
 
 
 @app.route('/auth/UserReg', methods=['GET', 'POST'])
 def user_reg():
     '''用户注册'''
-    j_data = json.loads(request.get_data())  # -----load将字符串解析成json
+    j_data = request.json 
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+
     ent = UserDal.login_reg(j_data)
 
     print(ent.__dict__)
