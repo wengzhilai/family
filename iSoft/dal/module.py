@@ -6,5 +6,3 @@ class module(object):
         allData= FaModule.query.paginate(page,per_page=pageSize)
         return allData
 
-    def __init__(self, *args):
-        super(ClassName, self).__init__(*args))
