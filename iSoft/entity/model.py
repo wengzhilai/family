@@ -685,7 +685,7 @@ class FaUser(db.Model):
     REGION = db.Column(db.String(10), nullable=False)
 
     fa_district = db.relationship(u'FaDistrict', primaryjoin='FaUser.DISTRICT_ID == FaDistrict.ID', backref=u'fa_users')
-    fa_user_info = db.relationship(u'FaUserInfo', secondary=u'fa_user_friend', backref=u'fa_users')
+    fa_user_info = db.relationship(u'FaUserInfo', secondary=u'fa_user_friend', backref=u'fa_users', lazy="select")
 
 
 class FaUserInfo(FaUser):
