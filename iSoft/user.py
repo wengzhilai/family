@@ -10,7 +10,7 @@ from iSoft.model.framework.RequesPagesModel import RequesPagesModel
 
 
 @app.route('/User/List', methods=['GET', 'POST'])
-@auth.login_required
+# @auth.login_required
 def user_list():
     j_data = request.json
     if j_data is None:
@@ -21,9 +21,8 @@ def user_list():
         where.append(eval("FaUser.%(Key)s%(Type)s%(Value)s" % search))
         pass
 
-    criterion = FaUser.ID, FaUser.ID
-    userlist = user.user_findall(in_ent.PageIndex, in_ent.PageSize, criterion,
-                                 *where)
+    criterion = FaUser.ID
+    userlist = user.user_findall(in_ent.PageIndex, in_ent.PageSize, criterion, *where)
 
     if userlist is None:
         return Fun.class_to_JsonStr(AppReturnDTO(True, "", []))
