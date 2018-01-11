@@ -1,5 +1,5 @@
 from .PostBaseModel import PostBaseModel
-class RequesPagesModel(PostBaseModel):
+class RequestPagesModel(PostBaseModel):
     PageIndex=1
     PageSize=10
     AttachParams=[]

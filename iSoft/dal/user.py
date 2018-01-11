@@ -10,7 +10,8 @@ class user(object):
         for item in where:
             relist = relist.filter(item)
 
-        relist = relist.order_by(criterion)
+        for item in criterion:
+            relist = relist.order_by(item)
         num = relist.count()
         if pageIndex < 1:
             pageSize = 1

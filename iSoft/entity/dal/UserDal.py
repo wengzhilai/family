@@ -26,10 +26,8 @@ class UserDal(object):
         if in_ent.passWord is None or in_ent.passWord == '':
             return AppReturnDTO(False, "密码不能为空")
 
-        login = Login.query.filter_by(
-            LOGIN_NAME=in_ent.loginName).first()
-        user = FaUser.query.filter_by(
-            LOGIN_NAME=in_ent.loginName).first()
+        login = Login.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
+        user = FaUser.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
         # login=db_model.Login
         # user=db_model.User
         if user is None or login is None:
@@ -55,15 +53,15 @@ class UserDal(object):
     @staticmethod
     def login_reg(_inent):
         '''注册用户'''
-        
+
         in_ent = LogingModel()
         in_ent.__dict__ = _inent
         if in_ent.loginName is None or in_ent.loginName == '':
             return AppReturnDTO(False, "电话号码不能为空")
         if not Fun.is_phonenum(in_ent.loginName):
             return AppReturnDTO(False, "电话号码格式不正确")
-        complexity=Fun.password_complexity(in_ent.passWord)
-        if  complexity< PASSWORD_COMPLEXITY:
+        complexity = Fun.password_complexity(in_ent.passWord)
+        if complexity < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
         # now_time = datetime.datetime.now()
         # if VERIFY_CODE:

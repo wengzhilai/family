@@ -23,4 +23,4 @@ login_manager.login_message_category = "info"
 
 login_manager.init_app(app)
 
-from iSoft import views, login, user, role
+from iSoft import views, login, user, role, module
