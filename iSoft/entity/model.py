@@ -3,11 +3,7 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, Numeric, String, T
 from sqlalchemy.orm import relationship
 from sqlalchemy.schema import FetchedValue
 from flask_sqlalchemy import SQLAlchemy
-
-
-db = SQLAlchemy()
-
-
+from iSoft import db
 
 class FaAppVersion(db.Model):
     __tablename__ = 'fa_app_version'
