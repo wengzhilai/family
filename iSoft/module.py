@@ -10,6 +10,7 @@ from iSoft.dal.module import module
 from iSoft.entity.model import FaModule
 
 
+
 @app.route('/module/List', methods=['GET', 'POST'])
 @auth.login_required
 def module_list():
@@ -30,12 +31,23 @@ def module_list():
         in_ent.PageIndex, \
         in_ent.PageSize, \
         criterion, \
-        *where)
+        where)
 
     if message.is_success :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
+# {
+#     "SaveKeys":["NAME","CODE","IS_DEBUG","SHOW_ORDER"],
+#     "Data":{
+#         "ID":"1",
+#         "NAME":"系统管理",
+#         "IS_DEBUG":0,
+#         "IS_HIDE":0,
+#         "SHOW_ORDER":3,
+#         "CODE":"aaaaa"
+#     }
+# }
 @app.route('/module/save', methods=['GET', 'POST'])
 @auth.login_required
 def module_save():

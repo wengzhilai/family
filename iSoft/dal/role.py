@@ -1,15 +1,16 @@
-from iSoft.entity.model import db, FaModule
 import math
+
+from iSoft.entity.model import FaRole,Sequence, db
 from iSoft.core.model.AppReturnDTO import AppReturnDTO
 
 
-class module(FaModule):
+class Role(FaRole):
 
     def __init__(self):
         pass
 
-    def module_findall(self,pageIndex, pageSize, criterion, where):
-        relist = FaModule.query
+    def Role_findall(self, pageIndex, pageSize, criterion, where):
+        relist = FaRole.query
         for item in where:
             relist = relist.filter(item)
 
@@ -25,15 +26,18 @@ class module(FaModule):
         if pageIndex > max_page:
             return None
         relist = relist.paginate(pageIndex, per_page=pageSize).items
-        return relist,AppReturnDTO(True)
+        return relist, AppReturnDTO(True)
 
-
-    def module_Save(self, in_dict, saveKeys):
-        db_ent = FaModule.query.filter(FaModule.ID == in_dict["ID"]).first()
+    def Role_Save(self, in_dict, saveKeys):
+        db_ent = FaRole.query.filter(FaRole.ID == in_dict["ID"]).first()        
         if db_ent is None:
-            db_ent=self
+            db_ent = self
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
+            if db_ent.ID is None or db_ent.ID == 0 or db_ent.ID == '0':
+                seq=Sequence.query.filter(Sequence.seq_name=="FA_ROLE_SEQ").first()
+                if seq is not None:
+                    db_ent.ID=int(seq.current_val) + 1
             db.session.add(db_ent)
 
         else:
@@ -41,13 +45,11 @@ class module(FaModule):
                 setattr(db_ent, item, in_dict[item])
 
         db.session.commit()
-        return db_ent,AppReturnDTO(True)
+        return db_ent, AppReturnDTO(True)
 
-
-    def module_delete(self, key):
-        db_ent = FaModule.query.filter(FaModule.ID == key).first()
+    def Role_delete(self, key):
+        db_ent = FaRole.query.filter(FaRole.ID == key).first()
         if db_ent is not None:
             db.session.delete(db_ent)
         db.session.commit()
-        return True,AppReturnDTO(True)
-            
+        return True, AppReturnDTO(True)
