@@ -18,8 +18,12 @@ class AlchemyEncoder(json.JSONEncoder):
             # an SQLAlchemy class
             fields = {}
             for field in [x for x in dir(obj) if not x.startswith('_') and x != 'parent' and x != 'metadata' and x != "query" and x != "query_class"]:
-                data = obj.__getattribute__(field)
- 
+
+                try:
+                    data = obj.__getattribute__(field)
+                except:
+                    data=None
+                    
                 if data!=None and data !='':
                     try:
                         if hasattr(data,"__dict__"):
@@ -37,6 +41,5 @@ class AlchemyEncoder(json.JSONEncoder):
                             fields[field] = data
                     except TypeError:    # 添加了对datetime的处理
                             fields[field] = None
-            # a json-encodable dict
             return fields
         return json.JSONEncoder.default(self, obj)

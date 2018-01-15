@@ -1,6 +1,8 @@
 '''静态类'''
 import re
+import math
 import json
+from iSoft.entity.model import Sequence, db
 
 class Fun(object):
     '''静态方法'''
@@ -44,12 +46,10 @@ class Fun(object):
             re_dict.update(obj.__dict__)
             return re_dict
 
-
     @staticmethod
     def class_to_JsonStr(obj):
         '''把对类转成JSon字符串'''
         return json.dumps(Fun.convert_to_dict(obj), ensure_ascii=False)
-
 
     @staticmethod
     def is_phonenum(phone_num):
@@ -74,3 +74,48 @@ class Fun(object):
         if re.match(r'^.*(?=([\x21-\x7e]+)[^a-zA-Z0-9]).*$', passwd) is not None:
             _re_int += 1
         return _re_int
+
+    @staticmethod
+    def model_save(model, self, in_dict, saveKeys):
+        db_ent = model.query.filter(model.ID == in_dict["ID"]).first()        
+        if db_ent is None:
+            db_ent = self
+            for item in in_dict:
+                setattr(db_ent, item, in_dict[item])
+            if db_ent.ID is None or db_ent.ID == 0 or db_ent.ID == '0':
+                db_ent.ID=db.session.execute('select nextval("fa_role_seq") seq').fetchall()[0][0]
+            db.session.add(db_ent)
+
+        else:
+            for item in saveKeys:
+                setattr(db_ent, item, in_dict[item])
+
+        db.session.commit()
+        return db_ent, True
+
+
+    def model_findall(model, self, pageIndex, pageSize, criterion, where):
+        relist = model.query
+        for item in where:
+            relist = relist.filter(item)
+
+        for item in criterion:
+            relist = relist.order_by(item)
+        num = relist.count()
+        if pageIndex < 1:
+            pageSize = 1
+        if pageSize < 1:
+            pageSize = 10
+        # 最大页码
+        max_page = math.ceil(num / pageSize)  # 向上取整
+        if pageIndex > max_page:
+            return None
+        relist = relist.paginate(pageIndex, per_page=pageSize).items
+        return relist, True
+
+    def model_delete(model,self, key):
+        db_ent = model.query.filter(model.ID == key).first()
+        if db_ent is not None:
+            db.session.delete(db_ent)
+        db.session.commit()
+        return True
