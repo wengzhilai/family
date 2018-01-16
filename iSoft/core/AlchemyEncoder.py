@@ -9,7 +9,6 @@ import json
 import datetime
 import decimal
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from iSoft.core.Fun import Fun 
 
 class AlchemyEncoder(json.JSONEncoder):
     '''用于把实体类换成JSON'''

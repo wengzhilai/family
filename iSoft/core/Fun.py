@@ -2,7 +2,8 @@
 import re
 import math
 import json
-from iSoft.entity.model import Sequence, db
+from iSoft.entity.model import db
+from iSoft.core.model.AppReturnDTO import AppReturnDTO
 
 class Fun(object):
     '''静态方法'''
@@ -84,6 +85,7 @@ class Fun(object):
                 setattr(db_ent, item, in_dict[item])
             if db_ent.ID is None or db_ent.ID == 0 or db_ent.ID == '0':
                 db_ent.ID=db.session.execute('select nextval("fa_role_seq") seq').fetchall()[0][0]
+                
             db.session.add(db_ent)
 
         else:
@@ -91,7 +93,7 @@ class Fun(object):
                 setattr(db_ent, item, in_dict[item])
 
         db.session.commit()
-        return db_ent, True
+        return db_ent, AppReturnDTO(True)
 
 
     def model_findall(model, self, pageIndex, pageSize, criterion, where):
@@ -111,11 +113,11 @@ class Fun(object):
         if pageIndex > max_page:
             return None
         relist = relist.paginate(pageIndex, per_page=pageSize).items
-        return relist, True
+        return relist, AppReturnDTO(True)
 
     def model_delete(model,self, key):
         db_ent = model.query.filter(model.ID == key).first()
         if db_ent is not None:
             db.session.delete(db_ent)
         db.session.commit()
-        return True
+        return AppReturnDTO(True)
