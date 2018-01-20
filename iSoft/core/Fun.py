@@ -51,6 +51,10 @@ class Fun(object):
     def class_to_JsonStr(obj):
         '''把对类转成JSon字符串'''
         return json.dumps(Fun.convert_to_dict(obj), ensure_ascii=False)
+    @staticmethod
+    def class_to_class(inClass,outClass):
+        '''把对类转成JSon字符串'''
+        return outClass
 
     @staticmethod
     def is_phonenum(phone_num):
@@ -96,6 +100,7 @@ class Fun(object):
         return db_ent, AppReturnDTO(True)
 
 
+    @staticmethod
     def model_findall(model, self, pageIndex, pageSize, criterion, where):
         relist = model.query
         for item in where:
@@ -115,6 +120,7 @@ class Fun(object):
         relist = relist.paginate(pageIndex, per_page=pageSize).items
         return relist, AppReturnDTO(True)
 
+    @staticmethod
     def model_delete(model,self, key):
         db_ent = model.query.filter(model.ID == key).first()
         if db_ent is not None:

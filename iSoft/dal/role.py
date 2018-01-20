@@ -4,15 +4,25 @@ from iSoft.core.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.Fun import Fun
 from iSoft.entity.model import db
 from sqlalchemy.sql import exists
+import inspect
 
 class Role(FaRole):
     fa_user_arrid=[] #用于修改角色的用户，多对多的关系
+
     def __init__(self):
         pass
 
     def Role_findall(self, pageIndex, pageSize, criterion, where):
         relist,is_succ=Fun.model_findall(FaRole, self, pageIndex, pageSize, criterion, where)
-        return relist, is_succ
+        tmplist=[]
+        for target_list in relist:
+            tmp=Role()
+            tmp.__dict__=target_list.__dict__
+            userId=[x.ID for x in target_list.fa_user]
+            tmp.fa_user_arrid=userId
+            tmplist.append(tmp)
+
+        return tmplist, is_succ
 
     def Role_Save(self, in_dict, saveKeys):
         db_ent = FaRole.query.filter(FaRole.ID == in_dict["ID"]).first()        
