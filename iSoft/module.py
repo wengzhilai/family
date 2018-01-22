@@ -74,3 +74,5 @@ def module_delete():
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message)        
+
+     

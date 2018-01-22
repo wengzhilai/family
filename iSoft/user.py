@@ -5,8 +5,8 @@ from iSoft import auth, login_manager, app
 from flask import g, json, request
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
 from iSoft.core.model.AppReturnDTO import AppReturnDTO
-from iSoft.entity.model import FaUser
 from iSoft.model.framework.RequestPagesModel import RequestPagesModel
+from iSoft.model.framework.PostBaseModel import PostBaseModel
 
 
 @app.route('/User/List', methods=['GET', 'POST'])
@@ -24,11 +24,30 @@ def user_list():
     for search in in_ent.OrderBy:
         criterion.append(eval("FaUser.%(Key)s.%(Value)s()" % search))
 
-    userlist = user.user_findall(in_ent.PageIndex, in_ent.PageSize, criterion, *where)
+    _modele=user()
+    re_ent,message = _modele.user_findall(\
+        in_ent.PageIndex, \
+        in_ent.PageSize, \
+        criterion, \
+        where)
 
-    if userlist is None:
-        return Fun.class_to_JsonStr(AppReturnDTO(True, "", []))
-    userlist = userlist.items
+    if message.is_success :
+        message.set_data(re_ent)
+    return Fun.class_to_JsonStr(message)
 
-    re_ent = AppReturnDTO(True, data=userlist)
-    return json.dumps(Fun.convert_to_dict(re_ent), ensure_ascii=False)
+@app.route('/User/Module', methods=['GET', 'POST'])
+@auth.login_required
+def user_module():
+    j_data = request.json
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+    in_ent = PostBaseModel(j_data)
+    _mod=user()
+    if g == None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
+
+    re_ent,message= _mod.user_all_module(g.current_user.ID)
+    if message.is_success :
+        message.set_data(re_ent)
+
+    return Fun.class_to_JsonStr(message) 
