@@ -1,32 +1,33 @@
 from iSoft.core.Fun import Fun
-from iSoft import auth, app
-from flask import g, request
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
+from iSoft import auth, login_manager, app
+from flask import g, json, request
+from iSoft.core.AlchemyEncoder import AlchemyEncoder
+from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.model.framework.RequestPagesModel import RequestPagesModel
 from iSoft.model.framework.RequestSaveModel import RequestSaveModel
 from iSoft.model.framework.PostBaseModel import PostBaseModel
-from iSoft.dal.role import Role
-from iSoft.entity.model import FaRole
+from iSoft.dal.ModuleDal import ModuleDal
+from iSoft.entity.model import FaModule
 
 
 
-@app.route('/role/List', methods=['GET', 'POST'])
+@app.route('/module/List', methods=['GET', 'POST'])
 @auth.login_required
-def role_list():
+def module_list():
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = RequestPagesModel(j_data)
     where = []
     for search in in_ent.SearchKey:
-        where.append(eval("FaRole.%(Key)s%(Type)s%(Value)s" % search))
+        where.append(eval("FaModule.%(Key)s%(Type)s%(Value)s" % search))
 
     criterion=[]
     for search in in_ent.OrderBy:
-        criterion.append(eval("FaRole.%(Key)s.%(Value)s()" % search))
+        criterion.append(eval("FaModule.%(Key)s.%(Value)s()" % search))
 
-    _modele=Role()
-    re_ent,message = _modele.Role_findall(\
+    _modele=ModuleDal()
+    re_ent,message = _modele.module_findall(\
         in_ent.PageIndex, \
         in_ent.PageSize, \
         criterion, \
@@ -47,29 +48,31 @@ def role_list():
 #         "CODE":"aaaaa"
 #     }
 # }
-@app.route('/role/save', methods=['GET', 'POST'])
+@app.route('/module/save', methods=['GET', 'POST'])
 @auth.login_required
-def role_save():
+def module_save():
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = RequestSaveModel(j_data)
-    _modele=Role()
-    re_ent,message= _modele.Role_Save(in_dict=in_ent.Data,saveKeys=in_ent.SaveKeys)
+    _modele=ModuleDal()
+    re_ent,message= _modele.module_Save(in_dict=in_ent.Data,saveKeys=in_ent.SaveKeys)
     if message.is_success :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
         
-@app.route('/role/delete', methods=['GET', 'POST'])
+@app.route('/module/delete', methods=['GET', 'POST'])
 @auth.login_required
-def role_delete():
+def module_delete():
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = PostBaseModel(j_data)
-    _modele=Role()
-    re_ent,message= _modele.Role_delete(in_ent.Key)
+    _modele=ModuleDal()
+    re_ent,message= _modele.module_delete(in_ent.Key)
     if message.is_success :
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message)        
+
+     

@@ -3,11 +3,11 @@
 from iSoft.core.Fun import Fun
 from iSoft import auth, login_manager, app
 from flask import request, flash, g
-from iSoft.entity.dal.UserDal import UserDal
+from iSoft.dal.UserDal import UserDal
 from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
 import iSoft.entity.model
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
+from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
 import json
 

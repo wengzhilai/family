@@ -1,20 +1,39 @@
 '''用户业务处理'''
+
+from iSoft.entity.model import db, FaUser, FaModule, FaRole, FaLogin
+import math
+from iSoft.model.AppReturnDTO import AppReturnDTO
+from iSoft.core.Fun import Fun
+import numpy
+from iSoft.model.LogingModel import LogingModel
 import hashlib
 import iSoft.entity.model
 from sqlalchemy import and_
-from iSoft.core.model.LogingModel import LogingModel
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.Fun import Fun
 from config import PASSWORD_COMPLEXITY, VERIFY_CODE
 from sqlalchemy import or_, and_, create_engine
 from iSoft import db
 from iSoft.entity.model import FaUser
-from iSoft.entity.mymodels.Login import Login
+from iSoft.dal.LoginDal import LoginDal
 import datetime
 
 
-class UserDal(object):
-    '''用户业务处理'''
+
+
+class UserDal(FaUser):
+    def user_findall(self, pageIndex, pageSize, criterion, where):
+        relist,is_succ=Fun.model_findall(FaUser, self, pageIndex, pageSize, criterion, where)
+        return relist, is_succ
+
+    def user_all_module(self,userId):
+        db_ent = FaUser.query.filter(FaUser.ID == userId).first()
+
+        if db_ent is not None:
+            roleIdList = [item.fa_modules for item in db_ent.fa_roles if len(item.fa_modules)>0]
+            moduleIdList =list(numpy.array(roleIdList).flatten())
+                    
+            return moduleIdList,AppReturnDTO(True)
+        return None,AppReturnDTO(True)
 
     @staticmethod
     def user_login(_inent):
@@ -26,7 +45,7 @@ class UserDal(object):
         if in_ent.passWord is None or in_ent.passWord == '':
             return AppReturnDTO(False, "密码不能为空")
 
-        login = Login.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
+        login = FaLogin.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
         user = FaUser.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
         # login=db_model.Login
         # user=db_model.User
@@ -36,8 +55,8 @@ class UserDal(object):
         if login.PASSWORD != hashlib.md5(
                 in_ent.passWord.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
-        token = login.generate_auth_token()
-        token = login.generate_auth_token().decode('utf-8')
+        token = LoginDal().generate_auth_token()
+        token = LoginDal().generate_auth_token().decode('utf-8')
         return AppReturnDTO(True, "登录成功", user, token)
 
     @staticmethod
@@ -48,7 +67,7 @@ class UserDal(object):
     @staticmethod
     def verify_auth_token(token):
         '''验证token'''
-        return Login.verify_auth_token(token)
+        return LoginDal().verify_auth_token(token)
 
     @staticmethod
     def login_reg(_inent):
@@ -90,3 +109,4 @@ class UserDal(object):
     # def GetAll():
     #     user=db_model.User.query.all()
     #     return user
+    

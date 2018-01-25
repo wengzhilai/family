@@ -6,7 +6,7 @@ from iSoft import app, auth
 from flask_login import login_required
 from flask import make_response, request, g
 from functools import wraps
-from iSoft.entity.dal.UserDal import UserDal
+from iSoft.dal.UserDal import UserDal
 import json
 
 

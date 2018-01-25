@@ -2,10 +2,10 @@ from iSoft.entity.model import FaLogin,FaUser
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
                           SignatureExpired, BadSignature)
 from iSoft import app
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
+from iSoft.model.AppReturnDTO import AppReturnDTO
 import json
 
-class Login(FaLogin):
+class LoginDal(FaLogin):
     
     def generate_auth_token(self, expiration=60000):
         '''获取用户的token'''

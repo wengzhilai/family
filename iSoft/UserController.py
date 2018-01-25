@@ -1,12 +1,13 @@
 '''用户'''
 from iSoft.core.Fun import Fun
-from iSoft.dal.user import user
 from iSoft import auth, login_manager, app
 from flask import g, json, request
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
+from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.model.framework.RequestPagesModel import RequestPagesModel
 from iSoft.model.framework.PostBaseModel import PostBaseModel
+from iSoft.entity.model import FaUser
+from iSoft.dal.UserDal import UserDal
 
 
 @app.route('/User/List', methods=['GET', 'POST'])
@@ -24,7 +25,7 @@ def user_list():
     for search in in_ent.OrderBy:
         criterion.append(eval("FaUser.%(Key)s.%(Value)s()" % search))
 
-    _modele=user()
+    _modele=UserDal()
     re_ent,message = _modele.user_findall(\
         in_ent.PageIndex, \
         in_ent.PageSize, \
@@ -38,11 +39,14 @@ def user_list():
 @app.route('/User/Module', methods=['GET', 'POST'])
 @auth.login_required
 def user_module():
+    '''
+    获取用户的所有模块
+    '''
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = PostBaseModel(j_data)
-    _mod=user()
+    _mod=UserDal()
     if g == None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
 

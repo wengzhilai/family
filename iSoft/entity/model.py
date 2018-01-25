@@ -439,7 +439,7 @@ class FaRole(db.Model):
     REMARK = db.Column(db.String(255))
     TYPE = db.Column(db.Integer)
 
-    fa_user = db.relationship(u'FaUser', secondary=u'fa_user_role', backref=u'fa_roles',lazy="dynamic")
+    fa_user = db.relationship(u'FaUser', secondary=u'fa_user_role', backref=u'fa_roles')
 
 
 

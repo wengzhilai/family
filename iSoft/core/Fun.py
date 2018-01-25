@@ -3,7 +3,7 @@ import re
 import math
 import json
 from iSoft.entity.model import db
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
+from iSoft.model.AppReturnDTO import AppReturnDTO
 
 class Fun(object):
     '''静态方法'''

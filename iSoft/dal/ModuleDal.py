@@ -1,9 +1,9 @@
 from iSoft.entity.model import db, FaModule
 import math
-from iSoft.core.model.AppReturnDTO import AppReturnDTO
+from iSoft.model.AppReturnDTO import AppReturnDTO
 
 
-class module(FaModule):
+class ModuleDal(FaModule):
 
     def __init__(self):
         pass
