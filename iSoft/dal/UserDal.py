@@ -82,18 +82,6 @@ class UserDal(FaUser):
         complexity = Fun.password_complexity(in_ent.passWord)
         if complexity < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
-        # now_time = datetime.datetime.now()
-        # if VERIFY_CODE:
-        #
-        #     _sms_count = db.session.query(db_model.SmsSend).filter(
-        #         db_model.SmsSend.ADD_TIME < now_time,
-        #         db_model.SmsSend.PHONE_NO==in_ent.loginName,
-        #         db_model.SmsSend.CONTENT==in_ent.code
-        #         ).count()
-        #     if _sms_count==0:
-        #         return AppReturnDTO(False, "验证码错误")
-
-        # user = FaUser.query.filter(FaUser.CREATE_TIME > now_time).all()
         return AppReturnDTO(False, "暂不开放注册")
 
     @staticmethod

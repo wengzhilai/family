@@ -88,14 +88,11 @@ class Fun(object):
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
             if db_ent.ID is None or db_ent.ID == 0 or db_ent.ID == '0':
-                db_ent.ID=db.session.execute('select nextval("fa_role_seq") seq').fetchall()[0][0]
-                
+                db_ent.ID=db.session.execute('select nextval("{}_seq") seq'.format(FaModule.__tablename__)).fetchall()[0][0]
             db.session.add(db_ent)
-
         else:
             for item in saveKeys:
                 setattr(db_ent, item, in_dict[item])
-
         db.session.commit()
         return db_ent, AppReturnDTO(True)
 

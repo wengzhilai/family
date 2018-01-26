@@ -25,6 +25,7 @@ class RoleDal(FaRole):
         return tmplist, is_succ
 
     def Role_Save(self, in_dict, saveKeys):
+        
         db_ent = FaRole.query.filter(FaRole.ID == in_dict["ID"]).first()        
         if db_ent is None:
             db_ent = self
@@ -41,6 +42,9 @@ class RoleDal(FaRole):
 
         db.session.commit()
         return db_ent, AppReturnDTO(True)
+
+
+    
 
     def Role_delete(self, key):
         is_succ=Fun.model_delete(FaRole, self, key)
