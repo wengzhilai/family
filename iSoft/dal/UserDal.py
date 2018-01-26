@@ -56,7 +56,7 @@ class UserDal(FaUser):
                 in_ent.passWord.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
         token = LoginDal().generate_auth_token()
-        token = LoginDal().generate_auth_token().decode('utf-8')
+        token = token.decode('utf-8')
         return AppReturnDTO(True, "登录成功", user, token)
 
     @staticmethod
