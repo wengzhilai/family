@@ -73,3 +73,17 @@ def role_delete():
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message)        
+
+@app.route('/role/single', methods=['GET', 'POST'])
+@auth.login_required
+def role_single():
+    j_data = request.json
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+    in_ent = PostBaseModel(j_data)
+    _modele=RoleDal()
+    re_ent,message= _modele.Role_single(in_ent.Key)
+    if message.is_success :
+        message.set_data(re_ent)
+
+    return Fun.class_to_JsonStr(message)   

@@ -27,7 +27,7 @@ class AlchemyEncoder(json.JSONEncoder):
                 if data!=None and data !='':
                     try:
                         if hasattr(data,"__dict__"):
-                            break
+                            pass
                         elif isinstance(data, decimal.Decimal):
                             fields[field] = float(data)
                         elif isinstance(data, datetime.datetime):

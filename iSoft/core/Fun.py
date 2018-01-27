@@ -101,7 +101,7 @@ class Fun(object):
 
 
     @staticmethod
-    def model_findall(model, self, pageIndex, pageSize, criterion, where):
+    def model_findall(model, pageIndex, pageSize, criterion, where):
         relist = model.query
         for item in where:
             relist = relist.filter(item)
@@ -121,12 +121,17 @@ class Fun(object):
         return relist, AppReturnDTO(True)
 
     @staticmethod
-    def model_delete(model,self, key):
+    def model_delete(model, key):
         db_ent = model.query.filter(model.ID == key).first()
         if db_ent is not None:
             db.session.delete(db_ent)
         db.session.commit()
-        return AppReturnDTO(True)
+        return True,AppReturnDTO(True)
+
+    @staticmethod
+    def model_single(model, key):
+        db_ent = model.query.filter(model.ID == key).first()
+        return db_ent,AppReturnDTO(True)    
     
 
     @staticmethod

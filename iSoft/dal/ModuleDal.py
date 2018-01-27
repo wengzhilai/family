@@ -10,7 +10,7 @@ class ModuleDal(FaModule):
         pass
 
     def module_findall(self,pageIndex, pageSize, criterion, where):
-        relist,is_succ=Fun.model_findall(FaModule, self, pageIndex, pageSize, criterion, where)
+        relist,is_succ=Fun.model_findall(FaModule, pageIndex, pageSize, criterion, where)
         return relist,is_succ
 
 
@@ -19,9 +19,11 @@ class ModuleDal(FaModule):
         return relist,is_succ
 
     def module_delete(self, key):
-        db_ent = FaModule.query.filter(FaModule.ID == key).first()
-        if db_ent is not None:
-            db.session.delete(db_ent)
-        db.session.commit()
-        return True,AppReturnDTO(True)
+        relist,is_succ=Fun.model_delete(FaModule, key)
+        return relist,is_succ
+
+    def module_single(self, key):
+        relist,is_succ=Fun.model_single(FaModule, key)
+        return relist,is_succ
+
             
