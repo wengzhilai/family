@@ -42,7 +42,7 @@ class UserDal(FaUser):
         in_ent.__dict__ = _inent
         if in_ent.loginName is None or in_ent.loginName == '':
             return AppReturnDTO(False, "用户名不能为空")
-        if in_ent.passWord is None or in_ent.passWord == '':
+        if in_ent.password is None or in_ent.password == '':
             return AppReturnDTO(False, "密码不能为空")
 
         login = FaLogin.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
@@ -53,7 +53,7 @@ class UserDal(FaUser):
             return AppReturnDTO(False, "用户名有误")
 
         if login.PASSWORD != hashlib.md5(
-                in_ent.passWord.encode('utf-8')).hexdigest():
+                in_ent.password.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
         token = LoginDal().generate_auth_token()
         token = token.decode('utf-8')
