@@ -16,7 +16,7 @@ def verify_token(token):
     print('verify_token')
     print(token)
     msg, user = UserDal.verify_auth_token(token)
-    if msg.is_success:
+    if msg.IsSuccess:
         g.current_user = user
         return True
     return False

@@ -9,20 +9,20 @@ class AppReturnDTO(object):
     返回对象
     '''
     # 数据 json 格式
-    data = {}
+    Data = {}
     # 信息
-    msg = ""
+    Msg = ""
     # 是否成功
-    is_success = True
+    IsSuccess = True
     # 代码
-    code = ""
+    Code = ""
     def __init__(self, isSuccess=True, msg='', data=None, code=""):
-        self.code = code
-        self.is_success = isSuccess
-        self.msg = msg
-        self.data = json.loads(json.dumps(data, cls=AlchemyEncoder))
+        self.Code = code
+        self.IsSuccess = isSuccess
+        self.Msg = msg
+        self.Data = json.loads(json.dumps(data, cls=AlchemyEncoder))
 
     def set_data(self, data):
         '''设置数据格式为JSON'''
-        self.data = json.loads(json.dumps(data, cls=AlchemyEncoder))
+        self.Data = json.loads(json.dumps(data, cls=AlchemyEncoder))
         

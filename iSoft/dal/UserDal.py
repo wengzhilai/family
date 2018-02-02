@@ -25,6 +25,15 @@ class UserDal(FaUser):
         relist,is_succ=Fun.model_findall(FaUser, self, pageIndex, pageSize, criterion, where)
         return relist, is_succ
 
+    def user_Save(self, in_dict, saveKeys):
+        relist,is_succ=Fun.model_save(FaUser, self, in_dict, saveKeys)
+        return relist,is_succ
+
+    def user_delete(self, key):
+        is_succ=Fun.model_delete(FaUser, self, key)
+        return is_succ, is_succ
+        
+
     def user_all_module(self,userId):
         db_ent = FaUser.query.filter(FaUser.ID == userId).first()
 
@@ -42,7 +51,7 @@ class UserDal(FaUser):
         in_ent.__dict__ = _inent
         if in_ent.loginName is None or in_ent.loginName == '':
             return AppReturnDTO(False, "用户名不能为空")
-        if in_ent.passWord is None or in_ent.passWord == '':
+        if in_ent.password is None or in_ent.password == '':
             return AppReturnDTO(False, "密码不能为空")
 
         login = FaLogin.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
@@ -51,9 +60,10 @@ class UserDal(FaUser):
             return AppReturnDTO(False, "用户名有误")
 
         if login.PASSWORD != hashlib.md5(
-                in_ent.passWord.encode('utf-8')).hexdigest():
+                in_ent.password.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
-        token = Fun.generate_auth_token(user.ID)
+        token = LoginDal.generate_auth_token(user)
+        token = token.decode('utf-8')
         return AppReturnDTO(True, "登录成功", user, token)
 
     @staticmethod
@@ -76,7 +86,8 @@ class UserDal(FaUser):
             return AppReturnDTO(False, "电话号码不能为空")
         if not Fun.is_phonenum(in_ent.loginName):
             return AppReturnDTO(False, "电话号码格式不正确")
-        complexity = Fun.password_complexity(in_ent.passWord)
+
+        complexity = Fun.password_complexity(in_ent.password)
         if complexity < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
         return AppReturnDTO(False, "暂不开放注册")

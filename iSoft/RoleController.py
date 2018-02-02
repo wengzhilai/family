@@ -32,7 +32,7 @@ def role_list():
         criterion, \
         where)
 
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
@@ -56,7 +56,7 @@ def role_save():
     in_ent = RequestSaveModel(j_data)
     _modele=RoleDal()
     re_ent,message= _modele.Role_Save(in_dict=in_ent.Data,saveKeys=in_ent.SaveKeys)
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
         
@@ -69,7 +69,7 @@ def role_delete():
     in_ent = PostBaseModel(j_data)
     _modele=RoleDal()
     re_ent,message= _modele.Role_delete(in_ent.Key)
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message)        
