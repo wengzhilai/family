@@ -56,16 +56,18 @@ class UserDal(FaUser):
 
         login = FaLogin.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
         user = FaUser.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
-        # login=db_model.Login
-        # user=db_model.User
         if user is None or login is None:
             return AppReturnDTO(False, "用户名有误")
 
         if login.PASSWORD != hashlib.md5(
                 in_ent.password.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
+<<<<<<< HEAD
         token = LoginDal.generate_auth_token(user)
         token = token.decode('utf-8')
+=======
+        token = Fun.generate_auth_token(user.ID)
+>>>>>>> 8ce8394a4d0d01ef962d507b09e96bf5afe43159
         return AppReturnDTO(True, "登录成功", user, token)
 
     @staticmethod
@@ -76,7 +78,7 @@ class UserDal(FaUser):
     @staticmethod
     def verify_auth_token(token):
         '''验证token'''
-        return LoginDal().verify_auth_token(token)
+        return Fun.verify_auth_token(token)
 
     @staticmethod
     def login_reg(_inent):
@@ -102,8 +104,4 @@ class UserDal(FaUser):
         user = FaUser.query.filter(FaUser.CREATE_TIME < now_time).all()
         return user
 
-    # @staticmethod
-    # def GetAll():
-    #     user=db_model.User.query.all()
-    #     return user
-    
+

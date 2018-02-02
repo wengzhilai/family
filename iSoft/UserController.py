@@ -64,7 +64,8 @@ def user_module():
     if g == None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
 
-    re_ent,message= _mod.user_all_module(g.current_user.ID)
+
+    re_ent,message= _mod.user_all_module(g.current_user['ID'])
     if message.IsSuccess :
         message.set_data(re_ent)
 
