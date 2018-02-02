@@ -7,10 +7,11 @@ import json
 
 class LoginDal(FaLogin):
     
-    def generate_auth_token(self, expiration=60000):
+    @staticmethod
+    def generate_auth_token(userObj, expiration=60000):
         '''获取用户的token'''
         ser = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
-        return ser.dumps({'ID':self.ID})    
+        return ser.dumps({'ID':userObj.ID})    
 
     @staticmethod
     def verify_auth_token(token):
@@ -18,6 +19,8 @@ class LoginDal(FaLogin):
         ser = Serializer(app.config['SECRET_KEY'])
         try:
             data = ser.loads(token)
+            if not isinstance(data['ID'],int) :
+                return AppReturnDTO(False, "登录超时"), None # valid token, but expired
             user = FaUser.query.filter_by(ID=int(data['ID'])).first()
         except SignatureExpired:
             return AppReturnDTO(False, "token已经过期"), None # valid token, but expired

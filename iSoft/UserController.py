@@ -5,6 +5,7 @@ from flask import g, json, request
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
 from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.model.framework.RequestPagesModel import RequestPagesModel
+from iSoft.model.framework.RequestSaveModel import RequestSaveModel
 from iSoft.model.framework.PostBaseModel import PostBaseModel
 from iSoft.entity.model import FaUser
 from iSoft.dal.UserDal import UserDal
@@ -32,7 +33,20 @@ def user_list():
         criterion, \
         where)
 
-    if message.is_success :
+    if message.IsSuccess :
+        message.set_data(re_ent)
+    return Fun.class_to_JsonStr(message)
+
+@app.route('/user/save', methods=['GET', 'POST'])
+@auth.login_required
+def user_save():
+    j_data = request.json
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+    in_ent = RequestSaveModel(j_data)
+    _modele=UserDal()
+    re_ent,message= _modele.user_Save(in_dict=in_ent.Data,saveKeys=in_ent.SaveKeys)
+    if message.IsSuccess :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
@@ -51,7 +65,7 @@ def user_module():
         return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
 
     re_ent,message= _mod.user_all_module(g.current_user.ID)
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message) 

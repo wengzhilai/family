@@ -25,6 +25,15 @@ class UserDal(FaUser):
         relist,is_succ=Fun.model_findall(FaUser, self, pageIndex, pageSize, criterion, where)
         return relist, is_succ
 
+    def user_Save(self, in_dict, saveKeys):
+        relist,is_succ=Fun.model_save(FaUser, self, in_dict, saveKeys)
+        return relist,is_succ
+
+    def user_delete(self, key):
+        is_succ=Fun.model_delete(FaUser, self, key)
+        return is_succ, is_succ
+        
+
     def user_all_module(self,userId):
         db_ent = FaUser.query.filter(FaUser.ID == userId).first()
 
@@ -55,7 +64,7 @@ class UserDal(FaUser):
         if login.PASSWORD != hashlib.md5(
                 in_ent.password.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
-        token = LoginDal().generate_auth_token()
+        token = LoginDal.generate_auth_token(user)
         token = token.decode('utf-8')
         return AppReturnDTO(True, "登录成功", user, token)
 

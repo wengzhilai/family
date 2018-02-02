@@ -33,7 +33,7 @@ def module_list():
         criterion, \
         where)
 
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
@@ -57,7 +57,7 @@ def module_save():
     in_ent = RequestSaveModel(j_data)
     _modele=ModuleDal()
     re_ent,message= _modele.module_Save(in_dict=in_ent.Data,saveKeys=in_ent.SaveKeys)
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
         
@@ -70,7 +70,7 @@ def module_delete():
     in_ent = PostBaseModel(j_data)
     _modele=ModuleDal()
     re_ent,message= _modele.module_delete(in_ent.Key)
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message)        
