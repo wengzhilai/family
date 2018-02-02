@@ -62,12 +62,8 @@ class UserDal(FaUser):
         if login.PASSWORD != hashlib.md5(
                 in_ent.password.encode('utf-8')).hexdigest():
             return AppReturnDTO(False, "密码有误")
-<<<<<<< HEAD
         token = LoginDal.generate_auth_token(user)
         token = token.decode('utf-8')
-=======
-        token = Fun.generate_auth_token(user.ID)
->>>>>>> 8ce8394a4d0d01ef962d507b09e96bf5afe43159
         return AppReturnDTO(True, "登录成功", user, token)
 
     @staticmethod
@@ -90,7 +86,8 @@ class UserDal(FaUser):
             return AppReturnDTO(False, "电话号码不能为空")
         if not Fun.is_phonenum(in_ent.loginName):
             return AppReturnDTO(False, "电话号码格式不正确")
-        complexity = Fun.password_complexity(in_ent.passWord)
+
+        complexity = Fun.password_complexity(in_ent.password)
         if complexity < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
         return AppReturnDTO(False, "暂不开放注册")
