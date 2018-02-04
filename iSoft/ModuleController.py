@@ -11,7 +11,7 @@ from iSoft.entity.model import FaModule
 
 
 
-@app.route('/module/List', methods=['GET', 'POST'])
+@app.route('/module/list', methods=['GET', 'POST'])
 @auth.login_required
 def module_list():
     j_data = request.json
@@ -20,34 +20,28 @@ def module_list():
     in_ent = RequestPagesModel(j_data)
     where = []
     for search in in_ent.SearchKey:
-        where.append(eval("FaModule.%(Key)s%(Type)s%(Value)s" % search))
+        if search["Type"]=="like" :
+            where.append(eval("FaModule.%(Key)s.like('%%%(Value)s%%')" % search))
+        else:
+            where.append(eval("FaModule.%(Key)s%(Type)s%(Value)s" % search))
 
-    criterion=[]
+    criterion = []
     for search in in_ent.OrderBy:
+        search["Value"] = search["Value"].lower()
         criterion.append(eval("FaModule.%(Key)s.%(Value)s()" % search))
 
-    _modele=ModuleDal()
-    re_ent,message = _modele.module_findall(\
-        in_ent.PageIndex, \
-        in_ent.PageSize, \
-        criterion, \
+    _modele = ModuleDal()
+    re_ent, message = _modele.module_findall(
+        in_ent.PageIndex,
+        in_ent.PageSize,
+        criterion,
         where)
 
-    if message.IsSuccess :
+    if message.IsSuccess:
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
-# {
-#     "SaveKeys":["NAME","CODE","IS_DEBUG","SHOW_ORDER"],
-#     "Data":{
-#         "ID":"1",
-#         "NAME":"系统管理",
-#         "IS_DEBUG":0,
-#         "IS_HIDE":0,
-#         "SHOW_ORDER":3,
-#         "CODE":"aaaaa"
-#     }
-# }
+
 @app.route('/module/save', methods=['GET', 'POST'])
 @auth.login_required
 def module_save():
@@ -69,10 +63,7 @@ def module_delete():
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = PostBaseModel(j_data)
     _modele=ModuleDal()
-    re_ent,message= _modele.module_delete(in_ent.Key)
-    if message.IsSuccess :
-        message.set_data(re_ent)
-
+    message= _modele.module_delete(in_ent.Key)
     return Fun.class_to_JsonStr(message)        
 
      

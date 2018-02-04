@@ -19,8 +19,8 @@ class ModuleDal(FaModule):
         return relist,is_succ
 
     def module_delete(self, key):
-        relist,is_succ=Fun.model_delete(FaModule, key)
-        return relist,is_succ
+        is_succ=Fun.model_delete(FaModule, key)
+        return is_succ
 
     def module_single(self, key):
         relist,is_succ=Fun.model_single(FaModule, key)
