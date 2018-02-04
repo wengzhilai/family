@@ -8,9 +8,7 @@ from iSoft.model.framework.PostBaseModel import PostBaseModel
 from iSoft.dal.RoleDal import RoleDal
 from iSoft.entity.model import FaRole
 
-
-
-@app.route('/role/List', methods=['GET', 'POST'])
+@app.route('/role/list', methods=['GET', 'POST'])
 @auth.login_required
 def role_list():
     j_data = request.json
@@ -19,34 +17,28 @@ def role_list():
     in_ent = RequestPagesModel(j_data)
     where = []
     for search in in_ent.SearchKey:
-        where.append(eval("FaRole.%(Key)s%(Type)s%(Value)s" % search))
+        if search["Type"]=="like" :
+            where.append(eval("FaRole.%(Key)s.like('%%%(Value)s%%')" % search))
+        else:
+            where.append(eval("FaRole.%(Key)s%(Type)s%(Value)s" % search))
 
-    criterion=[]
+    criterion = []
     for search in in_ent.OrderBy:
+        search["Value"] = search["Value"].lower()
         criterion.append(eval("FaRole.%(Key)s.%(Value)s()" % search))
 
-    _modele=RoleDal()
-    re_ent,message = _modele.Role_findall(\
-        in_ent.PageIndex, \
-        in_ent.PageSize, \
-        criterion, \
+    _modele = RoleDal()
+    re_ent, message = _modele.Role_findall(
+        in_ent.PageIndex,
+        in_ent.PageSize,
+        criterion,
         where)
 
-    if message.IsSuccess :
+    if message.IsSuccess:
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
-# {
-#     "SaveKeys":["NAME","CODE","IS_DEBUG","SHOW_ORDER"],
-#     "Data":{
-#         "ID":"1",
-#         "NAME":"系统管理",
-#         "IS_DEBUG":0,
-#         "IS_HIDE":0,
-#         "SHOW_ORDER":3,
-#         "CODE":"aaaaa"
-#     }
-# }
+
 @app.route('/role/save', methods=['GET', 'POST'])
 @auth.login_required
 def role_save():
@@ -68,9 +60,7 @@ def role_delete():
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = PostBaseModel(j_data)
     _modele=RoleDal()
-    re_ent,message= _modele.Role_delete(in_ent.Key)
-    if message.IsSuccess :
-        message.set_data(re_ent)
+    message= _modele.Role_delete(in_ent.Key)
 
     return Fun.class_to_JsonStr(message)        
 

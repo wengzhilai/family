@@ -24,7 +24,7 @@ class RoleDal(FaRole):
 
     def Role_delete(self, key):
         is_succ=Fun.model_delete(FaRole, key)
-        return is_succ, is_succ
+        return is_succ
 
     def Role_single(self, key):
         relist,is_succ=Fun.model_single(FaRole, key)

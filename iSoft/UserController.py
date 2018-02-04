@@ -20,22 +20,27 @@ def user_list():
     in_ent = RequestPagesModel(j_data)
     where = []
     for search in in_ent.SearchKey:
-        where.append(eval("FaUser.%(Key)s%(Type)s%(Value)s" % search))
+        if search["Type"]=="like" :
+            where.append(eval("FaUser.%(Key)s.like('%%%(Value)s%%')" % search))
+        else:
+            where.append(eval("FaUser.%(Key)s%(Type)s%(Value)s" % search))
 
-    criterion=[]
+    criterion = []
     for search in in_ent.OrderBy:
+        search["Value"] = search["Value"].lower()
         criterion.append(eval("FaUser.%(Key)s.%(Value)s()" % search))
 
-    _modele=UserDal()
-    re_ent,message = _modele.user_findall(\
-        in_ent.PageIndex, \
-        in_ent.PageSize, \
-        criterion, \
+    _modele = UserDal()
+    re_ent, message = _modele.user_findall(
+        in_ent.PageIndex,
+        in_ent.PageSize,
+        criterion,
         where)
 
-    if message.IsSuccess :
+    if message.IsSuccess:
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
+
 
 @app.route('/user/save', methods=['GET', 'POST'])
 @auth.login_required
@@ -44,11 +49,13 @@ def user_save():
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = RequestSaveModel(j_data)
-    _modele=UserDal()
-    re_ent,message= _modele.user_Save(in_dict=in_ent.Data,saveKeys=in_ent.SaveKeys)
-    if message.IsSuccess :
+    _modele = UserDal()
+    re_ent, message = _modele.user_Save(
+        in_dict=in_ent.Data, saveKeys=in_ent.SaveKeys)
+    if message.IsSuccess:
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
+
 
 @app.route('/User/Module', methods=['GET', 'POST'])
 @auth.login_required
@@ -60,13 +67,12 @@ def user_module():
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = PostBaseModel(j_data)
-    _mod=UserDal()
+    _mod = UserDal()
     if g == None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
 
-
-    re_ent,message= _mod.user_all_module(g.current_user['ID'])
-    if message.IsSuccess :
+    re_ent, message = _mod.user_all_module(g.current_user['ID'])
+    if message.IsSuccess:
         message.set_data(re_ent)
 
-    return Fun.class_to_JsonStr(message) 
+    return Fun.class_to_JsonStr(message)

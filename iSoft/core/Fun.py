@@ -8,6 +8,7 @@ from iSoft import app
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
                           SignatureExpired, BadSignature)
 
+
 class Fun(object):
     '''静态方法'''
     @staticmethod
@@ -26,7 +27,7 @@ class Fun(object):
         '''把对象列表转换为字典列表'''
         obj_arr = []
         for obj in objs:
-            #把Object对象转换成Dict对象
+            # 把Object对象转换成Dict对象
             re_dict = {}
             re_dict.update(obj.__dict__)
             obj_arr.append(re_dict)
@@ -40,7 +41,7 @@ class Fun(object):
         if is_list or is_set:
             obj_arr = []
             for obj1 in obj:
-                #把Object对象转换成Dict对象
+                # 把Object对象转换成Dict对象
                 re_dict = {}
                 re_dict.update(obj1.__dict__)
                 obj_arr.append(re_dict)
@@ -54,8 +55,9 @@ class Fun(object):
     def class_to_JsonStr(obj):
         '''把对类转成JSon字符串'''
         return json.dumps(Fun.convert_to_dict(obj), ensure_ascii=False)
+
     @staticmethod
-    def class_to_class(inClass,outClass):
+    def class_to_class(inClass, outClass):
         '''把对类转成JSon字符串'''
         return outClass
 
@@ -85,20 +87,19 @@ class Fun(object):
 
     @staticmethod
     def model_save(model, self, in_dict, saveKeys):
-        db_ent = model.query.filter(model.ID == in_dict["ID"]).first()        
+        db_ent = model.query.filter(model.ID == in_dict["ID"]).first()
         if db_ent is None:
             db_ent = self
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
-            if db_ent.ID is None or db_ent.ID == 0 or db_ent.ID == '0':
-                db_ent.ID=db.session.execute('select nextval("{}_seq") seq'.format(FaModule.__tablename__)).fetchall()[0][0]
+            if db_ent.ID is None or db_ent.ID == "" or db_ent.ID == 0 or db_ent.ID == '0':
+                db_ent.ID = db.session.execute('select nextval("{}_seq") seq'.format(model.__tablename__)).fetchall()[0][0]
             db.session.add(db_ent)
         else:
             for item in saveKeys:
                 setattr(db_ent, item, in_dict[item])
         db.session.commit()
         return db_ent, AppReturnDTO(True)
-
 
     @staticmethod
     def model_findall(model, pageIndex, pageSize, criterion, where):
@@ -116,9 +117,9 @@ class Fun(object):
         # 最大页码
         max_page = math.ceil(num / pageSize)  # 向上取整
         if pageIndex > max_page:
-            return None
+            return None, AppReturnDTO(True, num)
         relist = relist.paginate(pageIndex, per_page=pageSize).items
-        return relist, AppReturnDTO(True)
+        return relist, AppReturnDTO(True, num)
 
     @staticmethod
     def model_delete(model, key):
@@ -126,19 +127,18 @@ class Fun(object):
         if db_ent is not None:
             db.session.delete(db_ent)
         db.session.commit()
-        return True,AppReturnDTO(True)
+        return AppReturnDTO(True)
 
     @staticmethod
     def model_single(model, key):
         db_ent = model.query.filter(model.ID == key).first()
-        return db_ent,AppReturnDTO(True)    
-    
+        return db_ent, AppReturnDTO(True)
 
     @staticmethod
     def generate_auth_token(userId, expiration=60000):
         '''获取用户的token'''
         ser = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
-        token=ser.dumps({'ID':userId})
+        token = ser.dumps({'ID': userId})
         return token.decode('utf-8')
 
     @staticmethod
@@ -148,12 +148,13 @@ class Fun(object):
         try:
             data = ser.loads(token)
             if data is None:
-                return AppReturnDTO(False, "数据不存在"), None # invalid token
-            user = {'ID':int(data['ID'])}
+                return AppReturnDTO(False, "数据不存在"), None  # invalid token
+            user = {'ID': int(data['ID'])}
         except SignatureExpired:
-            return AppReturnDTO(False, "token已经过期"), None # valid token, but expired
+            # valid token, but expired
+            return AppReturnDTO(False, "token已经过期"), None
         except BadSignature:
-            return AppReturnDTO(False, "token无效"), None # invalid token
+            return AppReturnDTO(False, "token无效"), None  # invalid token
         except BaseException:
             return AppReturnDTO(False, "错误"), None
         if user is None:

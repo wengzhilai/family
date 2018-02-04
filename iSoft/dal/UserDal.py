@@ -22,7 +22,7 @@ import datetime
 
 class UserDal(FaUser):
     def user_findall(self, pageIndex, pageSize, criterion, where):
-        relist,is_succ=Fun.model_findall(FaUser, self, pageIndex, pageSize, criterion, where)
+        relist,is_succ=Fun.model_findall(FaUser, pageIndex, pageSize, criterion, where)
         return relist, is_succ
 
     def user_Save(self, in_dict, saveKeys):
