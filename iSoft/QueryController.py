@@ -7,13 +7,13 @@ from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.model.framework.RequestPagesModel import RequestPagesModel
 from iSoft.model.framework.RequestSaveModel import RequestSaveModel
 from iSoft.model.framework.PostBaseModel import PostBaseModel
-from iSoft.entity.model import FaUser
-from iSoft.dal.UserDal import UserDal
+from iSoft.entity.model import FaQuery
+from iSoft.dal.QueryDal import QueryDal
 
 
-@app.route('/user/list', methods=['GET', 'POST'])
+@app.route('/query/list', methods=['GET', 'POST'])
 @auth.login_required
-def user_list():
+def query_list():
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
@@ -21,17 +21,17 @@ def user_list():
     where = []
     for search in in_ent.SearchKey:
         if search["Type"]=="like" :
-            where.append(eval("FaUser.%(Key)s.like('%%%(Value)s%%')" % search))
+            where.append(eval("FaQuery.%(Key)s.like('%%%(Value)s%%')" % search))
         else:
-            where.append(eval("FaUser.%(Key)s%(Type)s%(Value)s" % search))
+            where.append(eval("FaQuery.%(Key)s%(Type)s%(Value)s" % search))
 
     criterion = []
     for search in in_ent.OrderBy:
         search["Value"] = search["Value"].lower()
-        criterion.append(eval("FaUser.%(Key)s.%(Value)s()" % search))
+        criterion.append(eval("FaQuery.%(Key)s.%(Value)s()" % search))
 
-    _modele = UserDal()
-    re_ent, message = _modele.user_findall(
+    _modele = QueryDal()
+    re_ent, message = _modele.query_findall(
         in_ent.PageIndex,
         in_ent.PageSize,
         criterion,
@@ -42,37 +42,29 @@ def user_list():
     return Fun.class_to_JsonStr(message)
 
 
-@app.route('/user/save', methods=['GET', 'POST'])
+@app.route('/query/save', methods=['GET', 'POST'])
 @auth.login_required
-def user_save():
+def query_save():
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = RequestSaveModel(j_data)
-    _modele = UserDal()
-    re_ent, message = _modele.user_Save(
+    _modele = QueryDal()
+    re_ent, message = _modele.query_Save(
         in_dict=in_ent.Data, saveKeys=in_ent.SaveKeys)
     if message.IsSuccess:
         message.set_data(re_ent)
     return Fun.class_to_JsonStr(message)
 
 
-@app.route('/User/Module', methods=['GET', 'POST'])
+        
+@app.route('/query/delete', methods=['GET', 'POST'])
 @auth.login_required
-def user_module():
-    '''
-    获取用户的所有模块
-    '''
+def query_delete():
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = PostBaseModel(j_data)
-    _mod = UserDal()
-    if g == None:
-        return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
-
-    re_ent, message = _mod.user_all_module(g.current_user['ID'])
-    if message.IsSuccess:
-        message.set_data(re_ent)
-
-    return Fun.class_to_JsonStr(message)
+    _modele=QueryDal()
+    message= _modele.query_delete(in_ent.Key)
+    return Fun.class_to_JsonStr(message)   

@@ -87,6 +87,9 @@ class Fun(object):
 
     @staticmethod
     def model_save(model, self, in_dict, saveKeys):
+         
+        if 'ID' not in in_dict:
+            in_dict["ID"] = 0
         db_ent = model.query.filter(model.ID == in_dict["ID"]).first()
         if db_ent is None:
             db_ent = self
@@ -97,7 +100,8 @@ class Fun(object):
             db.session.add(db_ent)
         else:
             for item in saveKeys:
-                setattr(db_ent, item, in_dict[item])
+                if item in in_dict:
+                    setattr(db_ent, item, in_dict[item])
         db.session.commit()
         return db_ent, AppReturnDTO(True)
 
