@@ -1,6 +1,7 @@
 #!E:\study\python\app\core\model\AppReturnDTO.py
 import json
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
+from iSoft.core.DecimalEncoder import DecimalEncoder
 '''
 返回模块
 '''
@@ -25,4 +26,7 @@ class AppReturnDTO(object):
     def set_data(self, data):
         '''设置数据格式为JSON'''
         self.Data = json.loads(json.dumps(data, cls=AlchemyEncoder))
-        
+    
+    def set_dict_data(self, data):
+        '''设置数据格式为JSON'''
+        self.Data = json.loads(json.dumps(data, cls=DecimalEncoder))

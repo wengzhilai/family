@@ -42,4 +42,5 @@ class AlchemyEncoder(json.JSONEncoder):
                     except TypeError:    # 添加了对datetime的处理
                             fields[field] = None
             return fields
+           
         return json.JSONEncoder.default(self, obj)

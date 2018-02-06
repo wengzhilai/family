@@ -26,4 +26,34 @@ class QueryDal(FaQuery):
         relist,is_succ=Fun.model_single(FaQuery, key)
         return relist,is_succ
 
-            
+    def query_singleByCode(self, code):
+        db_ent = FaQuery.query.filter(FaQuery.CODE == code).first()
+        if db_ent is None :
+            return db_ent, AppReturnDTO(False,"代码不存在")
+        
+        return db_ent, AppReturnDTO(True)
+    
+    #查看数据
+    def query_queryByCode(model,code, pageIndex, pageSize, criterion, where):
+        
+        db_ent = FaQuery.query.filter(FaQuery.CODE == code).first()
+        if db_ent is None :
+            return db_ent, AppReturnDTO(False,"代码不存在")
+
+        relist= db.session.execute(db_ent.QUERY_CONF)
+        allData=[]
+        for row in relist:
+            allData.append(row.items())
+
+        num = relist.rowcount
+        if pageIndex < 1:
+            pageSize = 1
+        if pageSize < 1:
+            pageSize = 10
+        # 最大页码
+        max_page = math.ceil(num / pageSize)  # 向上取整
+        if pageIndex > max_page:
+            return None, AppReturnDTO(True, num)
+       
+        # relist = relist.paginate(pageIndex, per_page=pageSize).items
+        return allData, AppReturnDTO(True, num)
