@@ -88,22 +88,10 @@ def query_query():
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = RequestPagesModel(j_data)
-    where = []
-    for search in in_ent.SearchKey:
-        if search["Type"] == "like":
-            where.append(
-                eval("FaQuery.%(Key)s.like('%%%(Value)s%%')" % search))
-        else:
-            where.append(eval("FaQuery.%(Key)s%(Type)s%(Value)s" % search))
-
-    criterion = []
-    for search in in_ent.OrderBy:
-        search["Value"] = search["Value"].lower()
-        criterion.append(eval("FaQuery.%(Key)s.%(Value)s()" % search))
 
     _modele = QueryDal()
     re_ent, message = _modele.query_queryByCode(
-        in_ent.Key, in_ent.PageIndex, in_ent.PageSize, criterion, where)
+        in_ent.Key, in_ent.PageIndex, in_ent.PageSize, in_ent.OrderBy, in_ent.SearchKey)
 
     if message.IsSuccess:
         message.set_dict_data(re_ent)
