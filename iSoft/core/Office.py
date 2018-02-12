@@ -17,6 +17,6 @@ class Office(object):
         for index, item in enumerate(_dictList):
             if index == 0:
                 ws.append([x[1].get("title") for x in _fig.items()])
-            ws.append([str(x) for x in item.values()])
+            ws.append([item.get(x) for x in _fig])
         # save the file
         wb.save(_fileName)

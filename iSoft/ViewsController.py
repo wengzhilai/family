@@ -32,14 +32,17 @@ def verify_token(token):
 @app.route('/view/export_query', methods=['GET', 'POST'])
 @auth.login_required
 def view_export():
+    """
+    导出EXCEL文件
+    """
     j_data = request.json
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
     in_ent = RequestPagesModel(j_data)
 
     _modele = QueryDal()
-    sql,cfg, message = _modele.query_GetSqlByCode(in_ent.Key, in_ent.SearchKey,
-                                              in_ent.OrderBy)
+    sql, cfg, message = _modele.query_GetSqlByCode(in_ent.Key, in_ent.SearchKey,
+                                                   in_ent.OrderBy)
     if not message.IsSuccess:
         return Fun.class_to_JsonStr(message)
 
@@ -47,16 +50,23 @@ def view_export():
     if not message.IsSuccess:
         return Fun.class_to_JsonStr(message)
 
-    file_name = "{0}\\tmp\\query_export\\query_{1}.xlsx".format(sys.path[0],in_ent.Key)
-    
-    Of.Office.ExportToXls(_dict,cfg, file_name)
+    dirpath = os.path.join(app.root_path, 'download')
+    file_name = "query_{0}.xlsx".format(in_ent.Key)
+
+    Of.Office.ExportToXls(_dict, cfg, dirpath + "\\" + file_name)
     # directory = os.getcwd()  # 假设在当前目录
     # response = make_response(
     #     send_from_directory(directory, file_name, as_attachment=True))
     # response.headers["Content-Disposition"] = "attachment; filename={}".format(
     #     file_name.encode().decode('latin-1'))
 
-    return Fun.class_to_JsonStr(AppReturnDTO(True, file_name))
+    return Fun.class_to_JsonStr(AppReturnDTO(True,"~/{0}/{1}".format('download',file_name)))
+
+
+@app.route("/download/<path:filename>")
+def downloader(filename):
+    dirpath = os.path.join(app.root_path, 'download')
+    return send_from_directory(dirpath, filename, as_attachment=True)
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -85,7 +95,7 @@ def projects():
     j = request.json
     b = request.get_data()
 
-    j_data = json.loads(str(b, encoding="utf-8"))  #-----load将字符串解析成json
+    j_data = json.loads(str(b, encoding="utf-8"))  # -----load将字符串解析成json
 
     # print(j_data)
     return j.__str__()
