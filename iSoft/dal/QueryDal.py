@@ -1,17 +1,17 @@
 from iSoft.entity.model import db, FaQuery
 import math
+import json
 from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.Fun import Fun
-
+import re
 
 class QueryDal(FaQuery):
-
     def __init__(self):
         pass
 
     def query_findall(self, pageIndex, pageSize, criterion, where):
-        relist, is_succ = Fun.model_findall(
-            FaQuery, pageIndex, pageSize, criterion, where)
+        relist, is_succ = Fun.model_findall(FaQuery, pageIndex, pageSize,
+                                            criterion, where)
         return relist, is_succ
 
     def query_Save(self, in_dict, saveKeys):
@@ -34,13 +34,11 @@ class QueryDal(FaQuery):
         return db_ent, AppReturnDTO(True)
 
     # 查看数据
-    def query_queryByCode(model, code, pageIndex, pageSize, criterion, where):
+    def query_queryByCode(self, code, pageIndex, pageSize, criterion, where):
 
-        db_ent = FaQuery.query.filter(FaQuery.CODE == code).first()
-        if db_ent is None:
-            return db_ent, AppReturnDTO(False, "代码不存在")
-
-        sql = db_ent.QUERY_CONF
+        sql,cfg,msg = self.query_GetSqlByCode(code,criterion,where)
+        if not msg.IsSuccess:
+            return sql,msg
         relist = db.session.execute(sql)
         num = relist.rowcount
         relist.close()
@@ -52,6 +50,30 @@ class QueryDal(FaQuery):
         max_page = math.ceil(num / pageSize)  # 向上取整
         if pageIndex > max_page:
             return None, AppReturnDTO(True, num)
+
+        pageSql = "{0} LIMIT {1},{2}".format(
+                    sql,
+                    (pageIndex - 1) * pageSize,
+                    pageSize
+                 )
+        
+        allData,msg= Fun.sql_to_dict(pageSql)
+        if msg.IsSuccess :
+            msg.Msg=num
+        # relist = relist.paginate(pageIndex, per_page=pageSize).items
+        return allData, msg
+
+    def query_GetSqlByCode(self, code, criterion, where):
+        """
+        根据查询代码运算出查询的SQL
+        用于导出数据，并统一管理配置的SQL
+        返回SQL和配置
+        """
+        db_ent = FaQuery.query.filter(FaQuery.CODE == code).first()
+        if db_ent is None:
+            return "","", AppReturnDTO(False, "代码不存在")
+
+        sql = db_ent.QUERY_CONF
         orderArr = []
         for order in criterion:
             orderArr.append("T.%(Key)s %(Value)s" % order)
@@ -63,21 +85,14 @@ class QueryDal(FaQuery):
             else:
                 whereArr.append("T.%(Key)s %(Type)s %(Value)s " % search)
 
-        sql = "SELECT * FROM ({0}) T{1}{2} LIMIT {3},{4}".format(
+        sql = "SELECT * FROM ({0}) T{1}{2}".format(
             sql,
             " WHERE " + " AND ".join(whereArr) if len(whereArr) > 0 else "",
             " ORDER BY " + " , ".join(orderArr) if len(orderArr) > 0 else "",
-            (pageIndex - 1) * pageSize,
-            pageSize
         )
-        relist = db.session.execute(sql)
-        allData = []
-        for row in relist:
-            tmpDic = {}
-            for dic in row.items():
-                tmpDic[dic[0]] = dic[1]
 
-            allData.append(tmpDic)
-
-        # relist = relist.paginate(pageIndex, per_page=pageSize).items
-        return allData, AppReturnDTO(True, num)
+        jsonStr= re.sub(r'\r|\n| ', "", db_ent.QUERY_CFG_JSON)
+        jsonStr= re.sub(r'\'', "\"", jsonStr)
+        jsonStr= re.sub(r'"onComponentInitFunction"[^},]+}', "", jsonStr)
+        jsonStr= re.sub(r',},', ",", jsonStr)
+        return sql,json.loads(jsonStr), AppReturnDTO(True)

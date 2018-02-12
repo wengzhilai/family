@@ -164,3 +164,18 @@ class Fun(object):
         if user is None:
             return AppReturnDTO(False, "用户不存在"), None
         return AppReturnDTO(True), user
+    
+    @staticmethod
+    def sql_to_dict(sql):
+        """
+        将SQL 执行成 dict
+        """
+        relist = db.session.execute(sql)
+        allData = []
+        for row in relist:
+            tmpDic = {}
+            for dic in row.items():
+                tmpDic[dic[0]] = dic[1]
+
+            allData.append(tmpDic)
+        return allData,AppReturnDTO(True)

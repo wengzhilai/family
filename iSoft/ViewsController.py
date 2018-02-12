@@ -1,13 +1,20 @@
 # file: view.py
 # -*- coding: utf-8 -*-
 '''首页'''
-import iSoft.core.Fun
+from iSoft.core.Fun import Fun
 from iSoft import app, auth
 from flask_login import login_required
-from flask import make_response, request, g
+from flask import send_file, make_response, send_from_directory, request, g
 from functools import wraps
 from iSoft.dal.UserDal import UserDal
 import json
+import os
+import sys
+import iSoft.core.Office as Of
+
+from iSoft.dal.QueryDal import QueryDal
+from iSoft.model.framework.RequestPagesModel import RequestPagesModel
+from iSoft.model.AppReturnDTO import AppReturnDTO
 
 
 @auth.verify_token
@@ -20,6 +27,36 @@ def verify_token(token):
         g.current_user = user
         return True
     return False
+
+
+@app.route('/view/export_query', methods=['GET', 'POST'])
+@auth.login_required
+def view_export():
+    j_data = request.json
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+    in_ent = RequestPagesModel(j_data)
+
+    _modele = QueryDal()
+    sql,cfg, message = _modele.query_GetSqlByCode(in_ent.Key, in_ent.SearchKey,
+                                              in_ent.OrderBy)
+    if not message.IsSuccess:
+        return Fun.class_to_JsonStr(message)
+
+    _dict, message = Fun.sql_to_dict(sql)
+    if not message.IsSuccess:
+        return Fun.class_to_JsonStr(message)
+
+    file_name = "{0}\\tmp\\query_export\\query_{1}.xlsx".format(sys.path[0],in_ent.Key)
+    
+    Of.Office.ExportToXls(_dict,cfg, file_name)
+    # directory = os.getcwd()  # 假设在当前目录
+    # response = make_response(
+    #     send_from_directory(directory, file_name, as_attachment=True))
+    # response.headers["Content-Disposition"] = "attachment; filename={}".format(
+    #     file_name.encode().decode('latin-1'))
+
+    return Fun.class_to_JsonStr(AppReturnDTO(True, file_name))
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -48,8 +85,8 @@ def projects():
     j = request.json
     b = request.get_data()
 
-    j_data = json.loads(str(b, encoding = "utf-8"))#-----load将字符串解析成json
-    
+    j_data = json.loads(str(b, encoding="utf-8"))  #-----load将字符串解析成json
+
     # print(j_data)
     return j.__str__()
 
