@@ -60,7 +60,7 @@ def view_export():
     # response.headers["Content-Disposition"] = "attachment; filename={}".format(
     #     file_name.encode().decode('latin-1'))
 
-    return Fun.class_to_JsonStr(AppReturnDTO(True,"~/{0}/{1}".format('download',file_name)))
+    return Fun.class_to_JsonStr(AppReturnDTO(True,"{0}/{1}".format('download',file_name)))
 
 
 @app.route("/download/<path:filename>")
