@@ -108,6 +108,10 @@ class Fun(object):
     @staticmethod
     def model_findall(model, pageIndex, pageSize, criterion, where):
         relist = model.query
+        if criterion is None:
+            criterion=[]
+        if where is None:
+            where=[]
         for item in where:
             relist = relist.filter(item)
 

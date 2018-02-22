@@ -73,7 +73,7 @@ def role_single():
     in_ent = PostBaseModel(j_data)
     _modele=RoleDal()
     re_ent,message= _modele.Role_single(in_ent.Key)
-    if message.is_success :
+    if message.IsSuccess :
         message.set_data(re_ent)
 
     return Fun.class_to_JsonStr(message)   

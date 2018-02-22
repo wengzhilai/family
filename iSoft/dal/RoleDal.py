@@ -4,11 +4,12 @@ from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.Fun import Fun
 from iSoft.entity.model import db
 from sqlalchemy.sql import exists
+from iSoft.dal.ModuleDal import ModuleDal
 import inspect
+
 
 class RoleDal(FaRole):
     fa_user_arrid=[] #用于修改角色的用户，多对多的关系
-    
     moduleIdStr=[] #模块ID字符串
     def __init__(self):
         pass
@@ -28,9 +29,10 @@ class RoleDal(FaRole):
 
     def Role_single(self, key):
         relist,is_succ=Fun.model_single(FaRole, key)
-
         tmp=RoleDal()
         tmp.__dict__=relist.__dict__
         userId=[x.ID for x in relist.fa_user]
+        moduleId=[x.ID for x in relist.fa_modules]
         tmp.fa_user_arrid=userId
+        tmp.moduleIdStr=moduleId
         return tmp,is_succ

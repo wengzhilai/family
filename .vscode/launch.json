@@ -12,7 +12,7 @@
             "cwd": "${workspaceRoot}",
             "args": [],
             "env": {},
-            "envFile": "${workspaceRoot}/.venv",
+            "envFile": "${workspaceRoot}/venv",
             "debugOptions": [
                 "WaitOnAbnormalExit",
                 "WaitOnNormalExit",

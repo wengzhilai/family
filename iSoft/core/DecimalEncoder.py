@@ -12,4 +12,4 @@ class DecimalEncoder(json.JSONEncoder):
             return data.strftime("%Y-%m-%d") 
         elif isinstance(data, datetime.timedelta):
             return (datetime.datetime.min + data).time().isoformat()
-        super(DecimalEncoder, self).default(o)
+        super(DecimalEncoder, self).default(data)
