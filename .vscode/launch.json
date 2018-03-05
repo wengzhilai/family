@@ -7,7 +7,7 @@
             "type": "python",
             "request": "launch",
             "stopOnEntry":false,
-            "pythonPath": "${config:python.pythonPath}",
+            "pythonPath": "${workspaceRoot}/venv/Scripts/python.exe",
             "program": "${workspaceRoot}/run.py",
             "cwd": "${workspaceRoot}",
             "args": [],
