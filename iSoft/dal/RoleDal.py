@@ -24,16 +24,16 @@ class RoleDal(FaRole):
         relist, is_succ = Fun.model_save(FaRole, self, in_dict, saveKeys)
 
         if is_succ.IsSuccess:  # 表示已经添加成功角色
-            db.session.execute('''
+            execObj = db.session.execute('''
                 DELETE
                 FROM
                     fa_role_module
                 WHERE
-                    fa_role_module.ROLE_ID = 1
-                AND fa_role_module.MODULE_ID IN (8, 9)
-            ''')
-            
-            db.session.execute('''
+                    fa_role_module.ROLE_ID = {0}
+                AND fa_role_module.MODULE_ID NOT IN ({1})
+            '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr)))
+            # print(execObj)
+            execObj = db.session.execute('''
                 INSERT INTO fa_role_module (ROLE_ID, MODULE_ID) 
                     SELECT
                         {0} ROLE_ID,
@@ -51,7 +51,8 @@ class RoleDal(FaRole):
                             ROLE_ID = {0}
                         AND MODULE_ID = fa_module.ID
                     )
-             '''.format(relist.ID, in_dict.moduleIdStr)).fetchall()[0][0]
+             '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr)))
+            #  print(execObj)
 
         return relist, is_succ
 

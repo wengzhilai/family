@@ -93,6 +93,6 @@ class QueryDal(FaQuery):
 
         jsonStr= re.sub(r'\r|\n| ', "", db_ent.QUERY_CFG_JSON)
         jsonStr= re.sub(r'\'', "\"", jsonStr)
-        jsonStr= re.sub(r'"onComponentInitFunction"[^},]+}', "", jsonStr)
+        jsonStr= re.sub(r'"onComponentInitFunction"((.|\n)+?)},', "", jsonStr)
         jsonStr= re.sub(r',},', ",", jsonStr)
         return sql,json.loads(jsonStr), AppReturnDTO(True)
