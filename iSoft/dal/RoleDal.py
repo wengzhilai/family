@@ -24,34 +24,36 @@ class RoleDal(FaRole):
         relist, is_succ = Fun.model_save(FaRole, self, in_dict, saveKeys)
 
         if is_succ.IsSuccess:  # 表示已经添加成功角色
-            execObj = db.session.execute('''
+            sqlStr='''
                 DELETE
                 FROM
                     fa_role_module
                 WHERE
                     fa_role_module.ROLE_ID = {0}
                 AND fa_role_module.MODULE_ID NOT IN ({1})
-            '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr)))
+            '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
+            execObj = db.session.execute(sqlStr)
             # print(execObj)
-            execObj = db.session.execute('''
+            sqlStr='''
                 INSERT INTO fa_role_module (ROLE_ID, MODULE_ID) 
                     SELECT
                         {0} ROLE_ID,
-                        fa_module.ID MODULE_ID
+                        m.ID MODULE_ID
                     FROM
-                        fa_module
+                        fa_module m
                     WHERE
-                        fa_module.ID IN ({1})
+                        m.ID IN ({1})
                     AND NOT EXISTS (
                         SELECT
-                            *
+                            tmp.ROLE_ID
                         FROM
-                            fa_role_module
+                            fa_role_module tmp
                         WHERE
-                            ROLE_ID = {0}
-                        AND MODULE_ID = fa_module.ID
+                            tmp.ROLE_ID = {0}
+                        AND tmp.MODULE_ID = m.ID
                     )
-             '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr)))
+             '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
+            execObj = db.session.execute(sqlStr)
             #  print(execObj)
 
         return relist, is_succ
