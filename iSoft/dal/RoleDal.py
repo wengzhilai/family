@@ -30,7 +30,6 @@ class RoleDal(FaRole):
                     fa_role_module
                 WHERE
                     fa_role_module.ROLE_ID = {0}
-                AND fa_role_module.MODULE_ID NOT IN ({1})
             '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
             execObj = db.session.execute(sqlStr)
             # print(execObj)
@@ -43,15 +42,6 @@ class RoleDal(FaRole):
                         fa_module m
                     WHERE
                         m.ID IN ({1})
-                    AND NOT EXISTS (
-                        SELECT
-                            tmp.ROLE_ID
-                        FROM
-                            fa_role_module tmp
-                        WHERE
-                            tmp.ROLE_ID = {0}
-                        AND tmp.MODULE_ID = m.ID
-                    )
              '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
             execObj = db.session.execute(sqlStr)
             #  print(execObj)
