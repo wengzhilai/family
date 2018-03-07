@@ -49,7 +49,14 @@ class RoleDal(FaRole):
         return relist, is_succ
 
     def Role_delete(self, key):
-        is_succ = Fun.model_delete(FaRole, key)
+        delSql = 'delete from fa_role_module where ROLE_ID IN ({0})'.format(key)
+        print(delSql)
+        db.session.execute(delSql)
+        delSql = 'delete from fa_role where ID IN ({0})'.format(key)
+        print(delSql)
+        db.session.execute(delSql)
+        db.session.commit()
+        return AppReturnDTO(True)
         return is_succ
 
     def Role_single(self, key):

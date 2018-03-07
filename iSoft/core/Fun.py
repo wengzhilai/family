@@ -87,7 +87,7 @@ class Fun(object):
 
     @staticmethod
     def model_save(model, self, in_dict, saveKeys):
-         
+
         if 'ID' not in in_dict:
             in_dict["ID"] = 0
         db_ent = model.query.filter(model.ID == in_dict["ID"]).first()
@@ -96,7 +96,8 @@ class Fun(object):
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
             if db_ent.ID is None or db_ent.ID == "" or db_ent.ID == 0 or db_ent.ID == '0':
-                db_ent.ID = db.session.execute('select nextval("{}_seq") seq'.format(model.__tablename__)).fetchall()[0][0]
+                db_ent.ID = db.session.execute('select nextval("{}_seq") seq'.format(
+                    model.__tablename__)).fetchall()[0][0]
             db.session.add(db_ent)
         else:
             for item in saveKeys:
@@ -109,9 +110,9 @@ class Fun(object):
     def model_findall(model, pageIndex, pageSize, criterion, where):
         relist = model.query
         if criterion is None:
-            criterion=[]
+            criterion = []
         if where is None:
-            where=[]
+            where = []
         for item in where:
             relist = relist.filter(item)
 
@@ -131,9 +132,9 @@ class Fun(object):
 
     @staticmethod
     def model_delete(model, key):
-        db_ent = model.query.filter(model.ID == key).first()
-        if db_ent is not None:
-            db.session.delete(db_ent)
+        delSql += 'delete from {0} where ID IN ({1});'.format(model.__tablename__, key)
+        print(delSql)
+        db.session.execute(delSql)
         db.session.commit()
         return AppReturnDTO(True)
 
@@ -168,7 +169,7 @@ class Fun(object):
         if user is None:
             return AppReturnDTO(False, "用户不存在"), None
         return AppReturnDTO(True), user
-    
+
     @staticmethod
     def sql_to_dict(sql):
         """
@@ -182,4 +183,4 @@ class Fun(object):
                 tmpDic[dic[0]] = dic[1]
 
             allData.append(tmpDic)
-        return allData,AppReturnDTO(True)
+        return allData, AppReturnDTO(True)

@@ -22,7 +22,7 @@ class QueryDal(FaQuery):
         jsonStr = re.sub(r',},', ",", jsonStr)
         try:
             x = json.loads(jsonStr)
-        except expression as identifier:
+        except :
             return None, AppReturnDTO(False, "列配置信息有误")
 
         relist, is_succ = Fun.model_save(FaQuery, self, in_dict, saveKeys)
