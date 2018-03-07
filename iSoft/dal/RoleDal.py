@@ -32,7 +32,7 @@ class RoleDal(FaRole):
                     fa_role_module.ROLE_ID = {0}
             '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
             execObj = db.session.execute(sqlStr)
-            # print(execObj)
+            print(sqlStr)
             sqlStr='''
                 INSERT INTO fa_role_module (ROLE_ID, MODULE_ID) 
                     SELECT
@@ -43,9 +43,9 @@ class RoleDal(FaRole):
                     WHERE
                         m.ID IN ({1})
              '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
+            print(sqlStr)
             execObj = db.session.execute(sqlStr)
-            #  print(execObj)
-
+            db.session.commit()
         return relist, is_succ
 
     def Role_delete(self, key):
