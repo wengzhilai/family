@@ -30,21 +30,22 @@ class RoleDal(FaRole):
                     fa_role_module
                 WHERE
                     fa_role_module.ROLE_ID = {0}
-            '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
-            execObj = db.session.execute(sqlStr)
-            print(sqlStr)
-            sqlStr='''
-                INSERT INTO fa_role_module (ROLE_ID, MODULE_ID) 
-                    SELECT
-                        {0} ROLE_ID,
-                        m.ID MODULE_ID
-                    FROM
-                        fa_module m
-                    WHERE
-                        m.ID IN ({1})
-             '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
+            '''.format(relist.ID)
             print(sqlStr)
             execObj = db.session.execute(sqlStr)
+            if len(relist.moduleIdStr)>0:
+                sqlStr='''
+                    INSERT INTO fa_role_module (ROLE_ID, MODULE_ID) 
+                        SELECT
+                            {0} ROLE_ID,
+                            m.ID MODULE_ID
+                        FROM
+                            fa_module m
+                        WHERE
+                            m.ID IN ({1})
+                '''.format(relist.ID, ','.join(str(i) for i in relist.moduleIdStr))
+                print(sqlStr)
+                execObj = db.session.execute(sqlStr)
             db.session.commit()
         return relist, is_succ
 
