@@ -21,12 +21,40 @@ import datetime
 
 
 class UserDal(FaUser):
+    roleIdList=[]
+    
     def user_findall(self, pageIndex, pageSize, criterion, where):
         relist,is_succ=Fun.model_findall(FaUser, pageIndex, pageSize, criterion, where)
         return relist, is_succ
 
     def user_Save(self, in_dict, saveKeys):
         relist,is_succ=Fun.model_save(FaUser, self, in_dict, saveKeys)
+        if is_succ.IsSuccess:  # 表示已经添加成功角色
+            sqlStr='''
+                DELETE
+                FROM
+                    fa_user_role
+                WHERE
+                    fa_user_role.USER_ID = {0}
+            '''.format(relist.ID)
+            print(sqlStr)
+            execObj = db.session.execute(sqlStr)
+            if len(relist.roleIdList)>0:
+                sqlStr='''
+                    INSERT INTO fa_user_role (ROLE_ID, USER_ID) 
+                        SELECT
+                            m.ID ROLE_ID,
+                            {0}  USER_ID
+                        FROM
+                            fa_role m
+                        WHERE
+                            m.ID IN ({1})
+                '''.format(relist.ID, ','.join(str(i) for i in relist.roleIdList))
+                print(sqlStr)
+                execObj = db.session.execute(sqlStr)
+            db.session.commit()
+
+
         return relist,is_succ
 
     def user_delete(self, key):
@@ -92,13 +120,14 @@ class UserDal(FaUser):
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
         return AppReturnDTO(False, "暂不开放注册")
 
-    @staticmethod
-    def single_user(userId):
+    def user_single(self, key):
         '''查询一用户'''
-        # user=db.Query(USER).all()
-        # user=db_model.User.query.filter_by(ID=1).all()
-        now_time = datetime.datetime.now()
-        user = FaUser.query.filter(FaUser.CREATE_TIME < now_time).all()
-        return user
+        relist, is_succ = Fun.model_single(FaUser, key)
+        tmp = UserDal()
+        tmp.__dict__ = relist.__dict__
+        tmpId = [x.ID for x in relist.fa_roles]
+        tmp.roleIdList = tmpId
+
+        return tmp, is_succ
 
 
