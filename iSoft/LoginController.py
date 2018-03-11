@@ -25,8 +25,9 @@ def user_login():
     j_data = request.json 
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+    _model=UserDal()
 
-    ent = UserDal.user_login(j_data)
+    ent = _model.user_login(j_data)
     return Fun.class_to_JsonStr(ent)
 
 
