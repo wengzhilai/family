@@ -132,7 +132,7 @@ class Fun(object):
 
     @staticmethod
     def model_delete(model, key):
-        delSql += 'delete from {0} where ID IN ({1});'.format(model.__tablename__, key)
+        delSql = 'delete from {0} where ID IN ({1})'.format(model.__tablename__, key)
         print(delSql)
         db.session.execute(delSql)
         db.session.commit()

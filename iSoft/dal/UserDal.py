@@ -13,11 +13,12 @@ from iSoft.core.Fun import Fun
 from config import PASSWORD_COMPLEXITY, VERIFY_CODE
 from sqlalchemy import or_, and_, create_engine
 from iSoft import db
-from iSoft.entity.model import FaUser,FaModule
+from iSoft.entity.model import FaUser, FaModule
 from iSoft.dal.LoginDal import LoginDal
 import datetime
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
 import json
+
 
 class UserDal(FaUser):
     roleIdList = []
@@ -64,15 +65,17 @@ class UserDal(FaUser):
     def user_all_module(self, userId):
         db_ent = FaUser.query.filter(FaUser.ID == userId).first()
         if db_ent is not None:
-            # 获取所有 选中的模块
-            roleIdList = [item.fa_modules for item in db_ent.fa_roles if len(item.fa_modules) > 0]
+            # 获取所有 选中的模块,没有隐藏的模块
+            roleIdList = [[x for x in item.fa_modules if x.IS_HIDE == 0] for item in db_ent.fa_roles if len(item.fa_modules) > 0]
             moduleList = list(numpy.array(roleIdList).flatten())
-            moduleIdList = [item.ID for item in moduleList ]
-            moduleParentIdList = [item.PARENT_ID for item in moduleList if item.PARENT_ID not in moduleIdList]
-            
-            moduleParentList = FaModule.filter(FaModule.ID.in_(moduleParentIdList)).all()
-            print(moduleParentList)
-            return moduleList, AppReturnDTO(True)
+            moduleList = sorted(moduleList, key=lambda x: x.SHOW_ORDER)
+            moduleIdList = [item.ID for item in moduleList]
+            moduleParentIdList = [
+                item.PARENT_ID for item in moduleList if item.PARENT_ID not in moduleIdList]
+
+            moduleParentList = FaModule.query.filter(
+                FaModule.ID.in_(moduleParentIdList)).all()
+            return moduleList + moduleParentList, AppReturnDTO(True)
         return None, AppReturnDTO(True)
 
     def user_single(self, key):
@@ -111,8 +114,9 @@ class UserDal(FaUser):
         # 获取用户模块
         if not msg.IsSuccess:
             return msg
-            
-        tmp.moduleList = json.loads(json.dumps(moduleIdList, cls=AlchemyEncoder))
+
+        tmp.moduleList = json.loads(
+            json.dumps(moduleIdList, cls=AlchemyEncoder))
         token = LoginDal.generate_auth_token(tmp)
         token = token.decode('utf-8')
         return AppReturnDTO(True, "登录成功", tmp, token)
