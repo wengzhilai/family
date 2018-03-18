@@ -7,6 +7,7 @@ from flask_login import login_required
 from flask import send_file, make_response, send_from_directory, request, g
 from functools import wraps
 from iSoft.dal.UserDal import UserDal
+from iSoft.dal.AuthDal import AuthDal
 import json
 import os
 import sys
@@ -22,7 +23,7 @@ def verify_token(token):
     '''验证toke'''
     print('verify_token')
     print(token)
-    msg, user = UserDal.verify_auth_token(token)
+    msg, user = AuthDal.verify_auth_token(token)
     if msg.IsSuccess:
         g.current_user = user
         return True

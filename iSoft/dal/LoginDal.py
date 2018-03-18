@@ -1,33 +1,18 @@
-from iSoft.entity.model import FaLogin,FaUser
-from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
-                          SignatureExpired, BadSignature)
+from iSoft.entity.model import db, FaLogin, FaUser
 from iSoft import app
 from iSoft.model.AppReturnDTO import AppReturnDTO
 import json
 
-class LoginDal(FaLogin):
-    
-    @staticmethod
-    def generate_auth_token(userObj, expiration=60000):
-        '''获取用户的token'''
-        ser = Serializer(app.config['SECRET_KEY'], expires_in=expiration)
-        return ser.dumps({'ID':userObj.ID})    
 
-    @staticmethod
-    def verify_auth_token(token):
-        '''根据token获取用户'''
-        ser = Serializer(app.config['SECRET_KEY'])
-        try:
-            data = ser.loads(token)
-            if not isinstance(data['ID'],int) :
-                return AppReturnDTO(False, "登录超时"), None # valid token, but expired
-            user = FaUser.query.filter_by(ID=int(data['ID'])).first()
-        except SignatureExpired:
-            return AppReturnDTO(False, "token已经过期"), None # valid token, but expired
-        except BadSignature:
-            return AppReturnDTO(False, "token无效"), None # invalid token
-        except BaseException:
-            return AppReturnDTO(False, "错误"), None
-        if user is None:
-            return AppReturnDTO(False, "用户不存在"), None
-        return AppReturnDTO(True), user    
+class LoginDal(FaLogin):
+
+    def UpdateCode(self, loginName, verifyCode):
+        sql = "update fa_login set VERIFY_CODE='{0}' where LOGIN_NAME='{1}'".format(
+            verifyCode, loginName)
+        resource=db.session.execute(sql)
+        updateNum = resource.rowcount
+        db.session.close()
+        if updateNum !=1:
+            return AppReturnDTO(False, "影响数不为1")
+        
+        return AppReturnDTO(True, "成功")

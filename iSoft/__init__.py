@@ -23,5 +23,6 @@ login_manager.login_message_category = "info"
 
 login_manager.init_app(app)
 
-from iSoft import ViewsController, LoginController,UserController, RoleController, ModuleController, QueryController
-from iSoft import DistrictController
+from iSoft import ViewsController, AuthController, UserController, RoleController, ModuleController, QueryController
+from iSoft import DistrictController, WebApiController
+

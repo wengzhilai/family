@@ -1,9 +1,10 @@
 # file: login.py
-'''首页'''
+'''权限认证'''
 from iSoft.core.Fun import Fun
 from iSoft import auth, login_manager, app
 from flask import request, flash, g
 from iSoft.dal.UserDal import UserDal
+from iSoft.dal.AuthDal import AuthDal
 from flask_login import (LoginManager, login_required, login_user,
                          current_user, logout_user, UserMixin)
 import iSoft.entity.model
@@ -15,7 +16,7 @@ import json
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     '''退出登录'''
-    re_ent = UserDal.login_out()
+    re_ent = AuthDal.login_out()
     return json.dumps(Fun.convert_to_dict(re_ent))
 
 
@@ -38,7 +39,7 @@ def user_reg():
     if j_data is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
 
-    ent = UserDal.login_reg(j_data)
+    ent = AuthDal.login_reg(j_data)
 
     print(ent.__dict__)
     # return json.dumps(ent, cls=AlchemyEncoder)
