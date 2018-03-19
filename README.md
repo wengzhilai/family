@@ -12,6 +12,8 @@ The sqlite database must also be created before the application can run, and the
 
 Running
 -------
+
+virtualenv -p python3 --no-site-packages venv
 virtualenv --no-site-packages venv
 
 To run the application in the development web server just execute `run.py` with the Python interpreter from the flask virtual environment.
