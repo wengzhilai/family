@@ -96,7 +96,8 @@ class Fun(object):
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
             if db_ent.ID is None or db_ent.ID == "" or db_ent.ID == 0 or db_ent.ID == '0':
-                db_ent.ID = db.session.execute('select nextval("{}_seq") seq'.format(model.__tablename__)).fetchall()[0][0]
+                db_ent.ID = db.session.execute('select nextval("{}_seq") seq'.format(
+                    model.__tablename__)).fetchall()[0][0]
             db.session.add(db_ent)
         else:
             for item in saveKeys:
@@ -131,7 +132,8 @@ class Fun(object):
 
     @staticmethod
     def model_delete(model, key):
-        delSql = 'delete from {0} where ID IN ({1})'.format(model.__tablename__, key)
+        delSql = 'delete from {0} where ID IN ({1})'.format(
+            model.__tablename__, key)
         print(delSql)
         db.session.execute(delSql)
         db.session.commit()
@@ -183,3 +185,18 @@ class Fun(object):
 
             allData.append(tmpDic)
         return allData, AppReturnDTO(True)
+
+    @staticmethod
+    def post_to_dict(request):
+        '''把请求的数据，转换成dict'''
+        j_data = request.json
+        if j_data is None:
+            return None, AppReturnDTO(False, "参数有误")
+        return j_data, AppReturnDTO(True)
+
+    @staticmethod
+    def IsNullOrEmpty(_instr):
+        '''判断值是否是空'''
+        if _instr is None or not _instr.strip():
+            return True
+        return False

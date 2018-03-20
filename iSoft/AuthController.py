@@ -44,3 +44,5 @@ def user_reg():
     print(ent.__dict__)
     # return json.dumps(ent, cls=AlchemyEncoder)
     return json.dumps(Fun.convert_to_dict(ent), ensure_ascii=False)
+
+
