@@ -42,18 +42,3 @@ class AuthDal(FaLogin):
         '''验证token'''
         return Fun.verify_auth_token(token)
 
-    @staticmethod
-    def login_reg(_inent):
-        '''注册用户'''
-
-        in_ent = LogingModel()
-        in_ent.__dict__ = _inent
-        if in_ent.loginName is None or in_ent.loginName == '':
-            return AppReturnDTO(False, "电话号码不能为空")
-        if not Fun.is_phonenum(in_ent.loginName):
-            return AppReturnDTO(False, "电话号码格式不正确")
-
-        complexity = Fun.password_complexity(in_ent.password)
-        if complexity < PASSWORD_COMPLEXITY:
-            return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
-        return AppReturnDTO(False, "暂不开放注册")

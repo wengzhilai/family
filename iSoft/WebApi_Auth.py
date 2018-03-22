@@ -13,7 +13,6 @@ import random  # 生成随机数
 from iSoft.model.framework.RequestSaveModel import RequestSaveModel
 
 
-
 @app.route('/Api/Login/ResetPassword', methods=['GET', 'POST'])
 def ApiResetPassword():
     '''
@@ -57,3 +56,18 @@ def UserInfo_SingleByName():
     if message.IsSuccess:
         message.set_data(re_ent)
     return json.dumps(Fun.convert_to_dict(message))
+
+@app.route('/Api/UserInfo/Register', methods=['GET', 'POST'])
+def UserInfo_Register():
+    '''
+    用于手机端注册用户
+    '''
+    j_data, message = Fun.post_to_dict(request)
+    if j_data is None:
+        return Fun.class_to_JsonStr(message)
+    postEnt = RequestSaveModel(j_data)
+    if postEnt is None or postEnt.Data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有问题"))
+    dal=UserInfoDal()
+    postEnt =dal.userInfo_register(postEnt.Data)
+    return Fun.class_to_JsonStr(postEnt)

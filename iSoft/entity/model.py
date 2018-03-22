@@ -311,7 +311,6 @@ class FaLogin(db.Model):
     IS_LOCKED = db.Column(db.Integer)
     PASS_UPDATE_DATE = db.Column(db.DateTime)
     LOCKED_REASON = db.Column(db.String(255))
-    REGION = db.Column(db.String(10), nullable=False)
     FAIL_COUNT = db.Column(db.Integer)
 
     fa_oauth = db.relationship(u'FaOauth', secondary=u'fa_oauth_login', backref=u'fa_logins')
@@ -678,7 +677,6 @@ class FaUser(db.Model):
     LAST_LOGOUT_TIME = db.Column(db.DateTime)
     LAST_ACTIVE_TIME = db.Column(db.DateTime)
     REMARK = db.Column(db.String(2000))
-    REGION = db.Column(db.String(10), nullable=False)
 
     fa_district = db.relationship(u'FaDistrict', primaryjoin='FaUser.DISTRICT_ID == FaDistrict.ID', backref=u'fa_users')
     fa_user_info = db.relationship(u'FaUserInfo', secondary=u'fa_user_friend', backref=u'fa_users', lazy="select")

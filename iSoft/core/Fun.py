@@ -7,6 +7,7 @@ from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft import app
 from itsdangerous import (TimedJSONWebSignatureSerializer as Serializer,
                           SignatureExpired, BadSignature)
+import hashlib
 
 
 class Fun(object):
@@ -86,6 +87,11 @@ class Fun(object):
         return _re_int
 
     @staticmethod
+    def GetSeqId(model):
+        '''获取表的自增ID'''
+        return db.session.execute('select nextval("{}_seq") seq'.format(model.__tablename__)).fetchall()[0][0]
+
+    @staticmethod
     def model_save(model, self, in_dict, saveKeys):
 
         if 'ID' not in in_dict:
@@ -96,8 +102,7 @@ class Fun(object):
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
             if db_ent.ID is None or db_ent.ID == "" or db_ent.ID == 0 or db_ent.ID == '0':
-                db_ent.ID = db.session.execute('select nextval("{}_seq") seq'.format(
-                    model.__tablename__)).fetchall()[0][0]
+                db_ent.ID = GetSeqId(model)
             db.session.add(db_ent)
         else:
             for item in saveKeys:
@@ -200,3 +205,8 @@ class Fun(object):
         if _instr is None or not _instr.strip():
             return True
         return False
+
+    @staticmethod
+    def md5(_instr):
+        '''md5加密字符串 '''
+        return hashlib.md5(_instr.encode('utf-8')).hexdigest()

@@ -101,7 +101,7 @@ class UserDal(FaUser):
         if user is None or login is None:
             return AppReturnDTO(False, "用户名有误")
 
-        if login.PASSWORD != hashlib.md5(in_ent.password.encode('utf-8')).hexdigest():
+        if login.PASSWORD != Fun.md5(in_ent.password):
             return AppReturnDTO(False, "密码有误")
 
         tmp = UserDal()
