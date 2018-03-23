@@ -34,6 +34,7 @@ def ApiPublicSendCode():
     code = random.randint(1000, 9999)
     dal = LoginDal()
     re_ent = dal.UpdateCode(postEnt.Data["phoneNum"], code)
+    re_ent.Data=code
     return json.dumps(Fun.convert_to_dict(re_ent))
 
 

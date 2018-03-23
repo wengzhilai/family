@@ -13,12 +13,12 @@ from config import PASSWORD_COMPLEXITY, VERIFY_CODE
 from sqlalchemy import or_, and_, create_engine
 from iSoft import db
 from iSoft.entity.model import FaUser, FaModule, FaUserInfo, FaLogin
-from iSoft.dal.LoginDal import LoginDal
 import datetime
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
 import json
 from iSoft.model.AppRegisterModel import AppRegisterModel
 from .LoginDal import LoginDal
+from .UserDal import UserDal
 
 
 class UserInfoDal(FaUserInfo):
@@ -62,6 +62,7 @@ class UserInfoDal(FaUserInfo):
         '''
 
         in_ent = AppRegisterModel(_inDict)
+        
         # 检测电话号码是否合法
         if in_ent.loginName is None or in_ent.loginName == '':
             return AppReturnDTO(False, "电话号码不能为空")
@@ -72,28 +73,33 @@ class UserInfoDal(FaUserInfo):
         if complexity < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
         # 检测短信代码
-        checkOutPwd, msg = LoginDal().CheckOutPassword(in_ent.code, in_ent.loginName)
+        checkOutPwd, msg = LoginDal().CheckOutVerifyCode(in_ent.code, in_ent.loginName)
         # 失败则退出
         if not msg.IsSuccess or not checkOutPwd:
             return msg
         if len(in_ent.parentArr) < 2:
             return AppReturnDTO(False, "你节点有问题")
+            
+        userDal=UserDal()
+        if userDal.user_checkLoginExist(in_ent.loginName):
+            return AppReturnDTO(False, "{0}已经存在".format(in_ent.loginName))
+
         # 表示添加已经存在的用户，只需完善资料，并添加登录账号
         loginDal = LoginDal()
-
+        # 添加登录账号
         if "K" in in_ent.parentArr[0] and "V" in in_ent.parentArr[0]:
-            # 添加登录账号
+            # <- 获取添加成功后的Login实体 
             loginDal.LOGIN_NAME = in_ent.loginName
             loginDal.PASSWORD = in_ent.password
-            loginDal.PHONE_NO = in_ent.loginName
-            # 获取添加成功后的Login实体
+            loginDal.PHONE_NO = in_ent.loginName            
             loginEng, msg = loginDal.AddLoginName()
             if not msg.IsSuccess:
                 return msg
+            # ->
 
+            # <- 更新用户信息
             userInfoEnt = FaUserInfo.query.filter(
                 FaUserInfo.ID == int(in_ent.parentArr[0]["K"])).first()
-            userInfoEnt = FaUserInfo()
             if userInfoEnt is None:
                 return AppReturnDTO(False, "用户的ID有误")
             userInfoEnt.LOGIN_NAME = in_ent.loginName
@@ -104,13 +110,21 @@ class UserInfoDal(FaUserInfo):
             userInfoEnt.YEARS_TYPE = in_ent.YEARS_TYPE
             userInfoEnt.BIRTHDAY_TIME = datetime.datetime.strptime(in_ent.BIRTHDAY_TIME, '%Y-%m-%dT%H:%M:%SZ')
             userInfoEnt.BIRTHDAY_PLACE = in_ent.birthday_place
+            userInfoEnt.DIED_TIME=None
+            userInfoEnt.DIED_PLACE=None
+            # ->
 
             db.session.commit()
             return AppReturnDTO(True)
             pass
 
         # 如果有多个父级，都需要每一个每一个用户的添加
-        for i, item in in_ent.parentArr[0]:
+        for i in range(len(in_ent.parentArr)-1,-1,-1):
+            parentDict=in_ent.parentArr[i]
+            parentId=0
+            # 添加没有K的项
+            if "K" in parentDict and not Fun.IsNullOrEmpty(parentDict["K"]):
+                parentId=int(parentDict["K"])
             pass
 
         return AppReturnDTO(False, "暂不开放注册")

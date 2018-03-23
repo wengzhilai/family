@@ -119,5 +119,12 @@ class UserDal(FaUser):
         token = LoginDal.generate_auth_token(tmp)
         token = token.decode('utf-8')
         return AppReturnDTO(True, "登录成功", tmp, token)
+    
+    def user_checkLoginExist(self, loginName):
+        '检测登录名是否存在'
+        user = FaUser.query.filter_by(LOGIN_NAME=loginName).first()
+        if user is None:
+            return False
+        return True
 
 

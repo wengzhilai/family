@@ -10,6 +10,7 @@ from iSoft.core.Fun import Fun
 class LoginDal(FaLogin):
 
     def UpdateCode(self, loginName, verifyCode):
+        '更新短验证码，如果号码不存在，则添加新有号码'
         loginEnt=FaLogin.query.filter(FaLogin.LOGIN_NAME==loginName).first()
         if loginEnt is None:
             loginEnt=self
@@ -27,7 +28,7 @@ class LoginDal(FaLogin):
         db.session.close()
         return AppReturnDTO(True, "成功")
 
-    def CheckOutPassword(self, VerifyCode, LoginName):
+    def CheckOutVerifyCode(self, VerifyCode, LoginName):
         '''验证短信验证码是否正确'''
         if not VerifyCode.strip() or not LoginName.strip():
             return False, AppReturnDTO(False, "参数有误")
@@ -51,8 +52,8 @@ class LoginDal(FaLogin):
         return False, AppReturnDTO(False, "验证码有误请重新获取")
 
     def ResetPassword(self, VerifyCode, LoginName, NewPwd):
-
-        checkOutPwd, msg = self.CheckOutPassword(VerifyCode, LoginName)
+        '重设置密码'
+        checkOutPwd, msg = self.CheckOutVerifyCode(VerifyCode, LoginName)
         # 失败则退出
         if not msg.IsSuccess or not checkOutPwd:
             return None, msg
@@ -84,6 +85,6 @@ class LoginDal(FaLogin):
         self.ID = Fun.GetSeqId(self)
         self.REGION = 0
         self.FAIL_COUNT = 0
-        self.FAIL_COUNT = 0
+        self.PASSWORD = Fun.md5(self.PASSWORD)
         db.session.add(self)
         return self, AppReturnDTO(True)
