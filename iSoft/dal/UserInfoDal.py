@@ -25,8 +25,8 @@ class UserInfoDal(FaUserInfo):
     FatherName = ""
 
     def userInfo_findall(self, pageIndex, pageSize, criterion, where):
-        relist, is_succ = Fun.model_findall(
-            FaUserInfo, pageIndex, pageSize, criterion, where)
+        relist, is_succ = Fun.model_findall(FaUserInfo, pageIndex, pageSize,
+                                            criterion, where)
         return relist, is_succ
 
     def userInfo_Save(self, in_dict, saveKeys):
@@ -35,7 +35,7 @@ class UserInfoDal(FaUserInfo):
         return relist, is_succ
 
     def userInfo_delete(self, key):
-        is_succ = Fun.model_delete(FaUserInfo, self, key)
+        is_succ = Fun.model_delete(FaUserInfo, key)
         return is_succ, is_succ
 
     def userInfo_single(self, key):
@@ -62,7 +62,7 @@ class UserInfoDal(FaUserInfo):
         '''
 
         in_ent = AppRegisterModel(_inDict)
-        
+
         # 检测电话号码是否合法
         if in_ent.loginName is None or in_ent.loginName == '':
             return AppReturnDTO(False, "电话号码不能为空")
@@ -73,14 +73,15 @@ class UserInfoDal(FaUserInfo):
         if complexity < PASSWORD_COMPLEXITY:
             return AppReturnDTO(False, "密码复杂度不够:" + str(complexity))
         # 检测短信代码
-        checkOutPwd, msg = LoginDal().CheckOutVerifyCode(in_ent.code, in_ent.loginName)
+        checkOutPwd, msg = LoginDal().CheckOutVerifyCode(
+            in_ent.code, in_ent.loginName)
         # 失败则退出
         if not msg.IsSuccess or not checkOutPwd:
             return msg
         if len(in_ent.parentArr) < 2:
             return AppReturnDTO(False, "你节点有问题")
-            
-        userDal=UserDal()
+
+        userDal = UserDal()
         if userDal.user_checkLoginExist(in_ent.loginName):
             return AppReturnDTO(False, "{0}已经存在".format(in_ent.loginName))
 
@@ -88,43 +89,156 @@ class UserInfoDal(FaUserInfo):
         loginDal = LoginDal()
         # 添加登录账号
         if "K" in in_ent.parentArr[0] and "V" in in_ent.parentArr[0]:
-            # <- 获取添加成功后的Login实体 
-            loginDal.LOGIN_NAME = in_ent.loginName
-            loginDal.PASSWORD = in_ent.password
-            loginDal.PHONE_NO = in_ent.loginName            
-            loginEng, msg = loginDal.AddLoginName()
-            if not msg.IsSuccess:
-                return msg
-            # ->
-
-            # <- 更新用户信息
-            userInfoEnt = FaUserInfo.query.filter(
-                FaUserInfo.ID == int(in_ent.parentArr[0]["K"])).first()
-            if userInfoEnt is None:
-                return AppReturnDTO(False, "用户的ID有误")
-            userInfoEnt.LOGIN_NAME = in_ent.loginName
-            userInfoEnt.UPDATE_TIME = datetime.datetime.now()
-            userInfoEnt.NAME = in_ent.parentArr[0]["V"]
-            userInfoEnt.LEVEL_ID = in_ent.level_id
-            userInfoEnt.SEX = in_ent.sex
-            userInfoEnt.YEARS_TYPE = in_ent.YEARS_TYPE
-            userInfoEnt.BIRTHDAY_TIME = datetime.datetime.strptime(in_ent.BIRTHDAY_TIME, '%Y-%m-%dT%H:%M:%SZ')
-            userInfoEnt.BIRTHDAY_PLACE = in_ent.birthday_place
-            userInfoEnt.DIED_TIME=None
-            userInfoEnt.DIED_PLACE=None
-            # ->
-
+            
+            para = {
+                        'userId': int(in_ent.parentArr[0]["K"]),
+                        'loginName': in_ent.loginName,
+                        'password': in_ent.password,
+                        'name': in_ent.parentArr[0]["V"],
+                        'level_id': in_ent.level_id,
+                        'sex': in_ent.sex,
+                        'YEARS_TYPE': in_ent.YEARS_TYPE,
+                        'BIRTHDAY_TIME': in_ent.BIRTHDAY_TIME,
+                        'birthday_place': in_ent.birthday_place
+                    }
+            self.FinishUserInfoAndLogin(**para)
             db.session.commit()
             return AppReturnDTO(True)
-            pass
 
+        parentId = 0
         # 如果有多个父级，都需要每一个每一个用户的添加
-        for i in range(len(in_ent.parentArr)-1,-1,-1):
-            parentDict=in_ent.parentArr[i]
-            parentId=0
-            # 添加没有K的项
+        for i in range(len(in_ent.parentArr) - 1, -1, -1):
+            parentDict = in_ent.parentArr[i]
+            # 跳过包含K的项，因为有K的项是已经存在的，有K表示是下一个的父ID
             if "K" in parentDict and not Fun.IsNullOrEmpty(parentDict["K"]):
-                parentId=int(parentDict["K"])
-            pass
+                parentId = int(parentDict["K"])
+            else:
+                # 表示是需要添加的当前用户
+                if i == 0:
+                    para = {
+                        'parentId': parentId,
+                        'loginName': in_ent.loginName,
+                        'password': in_ent.password,
+                        'name': parentDict["V"],
+                        'level_id': in_ent.level_id,
+                        'sex': in_ent.sex,
+                        'YEARS_TYPE': in_ent.YEARS_TYPE,
+                        'BIRTHDAY_TIME': in_ent.BIRTHDAY_TIME,
+                        'birthday_place': in_ent.birthday_place
+                    }
+                    self.AddUserInfoAndLogin(**para)
+                    db.session.commit()
+                    pass
+                else:  # 只添加用户名
+                    parentEnt, msg = self.AddUserInfoSimple(
+                        parentDict["V"], parentId)
+                    if not msg.IsSuccess:  #如果失败则退出
+                        return msg
+                    parentId = parentEnt.ID # 用于下次添加的时候
+                    in_ent.parentArr[i]["K"]=parentId # 用于更新，该记录是谁添加和修改的
 
         return AppReturnDTO(False, "暂不开放注册")
+
+    def FinishUserInfoAndLogin(self, userId, loginName, password, name,
+                               level_id, sex, YEARS_TYPE, BIRTHDAY_TIME,
+                               birthday_place):
+        '完善用户的基本资料以及登录账号'
+        # <- 获取添加成功后的Login实体
+        loginDal = LoginDal()
+        loginDal.LOGIN_NAME = loginName
+        loginDal.PASSWORD = password
+        loginDal.PHONE_NO = loginName
+        loginEng, msg = loginDal.AddLoginName()
+        if not msg.IsSuccess:
+            return msg
+        # ->
+
+        # <- 更新用户信息
+        userInfoEnt = FaUserInfo.query.filter(
+            FaUserInfo.ID == int(userId)).first()
+        if userInfoEnt is None:
+            return AppReturnDTO(False, "用户的ID有误")
+        userInfoEnt.LOGIN_NAME = loginDal.LOGIN_NAME
+        userInfoEnt.UPDATE_TIME = datetime.datetime.now()
+        userInfoEnt.NAME = name
+        # userInfoEnt.NAME = in_ent.parentArr[0]["V"]
+        userInfoEnt.LEVEL_ID = level_id
+        userInfoEnt.SEX = sex
+        userInfoEnt.YEARS_TYPE = YEARS_TYPE
+        userInfoEnt.BIRTHDAY_TIME = datetime.datetime.strptime(
+            BIRTHDAY_TIME, '%Y-%m-%dT%H:%M:%SZ')
+        userInfoEnt.BIRTHDAY_PLACE = birthday_place
+        userInfoEnt.DIED_TIME = None
+        userInfoEnt.DIED_PLACE = None
+
+    def AddUserInfoAndLogin(self, parentId, loginName, password, name,
+                            level_id, sex, YEARS_TYPE, BIRTHDAY_TIME,
+                            birthday_place):
+        '完善用户的基本资料以及登录账号'
+
+        parentEnt = FaUserInfo.query.filter(FaUserInfo.ID == parentId).first()
+        if parentEnt is None:
+            return None, AppReturnDTO(False, "父ID有问题")
+        # <- 获取添加成功后的Login实体
+        loginDal = LoginDal()
+        loginDal.LOGIN_NAME = loginName
+        loginDal.PASSWORD = password
+        loginDal.PHONE_NO = loginName
+        loginEng, msg = loginDal.AddLoginName()
+        if not msg.IsSuccess:
+            return msg
+        # ->
+
+        # <- 更新用户信息
+        userInfoEnt = FaUserInfo()
+        userInfoEnt.ID = Fun.GetSeqId(FaUser)
+        userInfoEnt.FATHER_ID = parentId
+        userInfoEnt.LOGIN_NAME = loginDal.LOGIN_NAME
+        userInfoEnt.UPDATE_TIME = datetime.datetime.now()
+        userInfoEnt.NAME = name
+        userInfoEnt.LEVEL_ID = level_id
+        userInfoEnt.SEX = sex
+        userInfoEnt.YEARS_TYPE = YEARS_TYPE
+        if not Fun.IsNullOrEmpty(BIRTHDAY_TIME):
+            userInfoEnt.BIRTHDAY_TIME = datetime.datetime.strptime(
+                BIRTHDAY_TIME, '%Y-%m-%dT%H:%M:%SZ')
+        userInfoEnt.BIRTHDAY_PLACE = birthday_place
+        userInfoEnt.DIED_TIME = None
+        userInfoEnt.DIED_PLACE = None
+        userInfoEnt.DISTRICT_ID = parentEnt.DISTRICT_ID
+        userInfoEnt.IS_LOCKED = 0
+        userInfoEnt.CREATE_TIME = datetime.datetime.now()
+        userInfoEnt.LEVEL_ID = 1
+        userInfoEnt.STATUS = '正常'
+        userInfoEnt.CREATE_USER_NAME = name
+        userInfoEnt.CREATE_USER_ID = userInfoEnt.ID
+        userInfoEnt.UPDATE_TIME = datetime.datetime.now()
+        userInfoEnt.UPDATE_USER_NAME = name
+        db.session.add(userInfoEnt)
+        return userInfoEnt, AppReturnDTO(True)
+
+    def AddUserInfoSimple(self, name, parentId):
+        """
+        只添加用户的名称和父节点,不会添加登录账号,没提交事务
+            :param name: 用户名
+            :param parentId:父ID 
+        """
+        parentEnt = FaUserInfo.query.filter(FaUserInfo.ID == parentId).first()
+        if parentEnt is None:
+            return None, AppReturnDTO(False, "父ID有问题")
+
+        userInfoEnt = FaUserInfo()
+        userInfoEnt.ID = Fun.GetSeqId(FaUser)
+        userInfoEnt.NAME = name
+        userInfoEnt.FATHER_ID = parentId
+        userInfoEnt.DISTRICT_ID = parentEnt.DISTRICT_ID
+        userInfoEnt.IS_LOCKED = 0
+        userInfoEnt.CREATE_TIME = datetime.datetime.now()
+        userInfoEnt.LEVEL_ID = 1
+        userInfoEnt.STATUS = '正常'
+        userInfoEnt.CREATE_USER_NAME = '自动'
+        userInfoEnt.CREATE_USER_ID = '1'
+        userInfoEnt.UPDATE_TIME = datetime.datetime.now()
+        userInfoEnt.UPDATE_USER_NAME = 'admin'
+        db.session.add(userInfoEnt)
+        return userInfoEnt, AppReturnDTO(True)

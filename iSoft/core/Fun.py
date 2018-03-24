@@ -102,7 +102,7 @@ class Fun(object):
             for item in in_dict:
                 setattr(db_ent, item, in_dict[item])
             if db_ent.ID is None or db_ent.ID == "" or db_ent.ID == 0 or db_ent.ID == '0':
-                db_ent.ID = GetSeqId(model)
+                db_ent.ID = Fun.GetSeqId(model)
             db.session.add(db_ent)
         else:
             for item in saveKeys:
@@ -202,7 +202,7 @@ class Fun(object):
     @staticmethod
     def IsNullOrEmpty(_instr):
         '''判断值是否是空'''
-        if _instr is None or not _instr.strip():
+        if _instr is None or not str(_instr).strip():
             return True
         return False
 
