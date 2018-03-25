@@ -5,6 +5,7 @@ from iSoft import auth, login_manager, app
 from flask import request, flash, g
 from iSoft.dal.LoginDal import LoginDal
 from iSoft.dal.UserInfoDal import UserInfoDal
+from iSoft.dal.UserDal import UserDal
 import iSoft.entity.model
 from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
@@ -71,3 +72,14 @@ def UserInfo_Register():
     dal=UserInfoDal()
     postEnt =dal.userInfo_register(postEnt.Data)
     return Fun.class_to_JsonStr(postEnt)
+
+@app.route('/Api/auth/UserLogin', methods=['GET', 'POST'])
+def auth_UserLogin():
+    '''手机用户登录'''
+    j_data = request.json 
+    if j_data is None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False, "参数有误"))
+    _model=UserDal()
+
+    ent = _model.user_login(j_data)
+    return Fun.class_to_JsonStr(ent)

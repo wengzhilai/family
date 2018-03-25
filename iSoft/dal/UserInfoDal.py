@@ -137,7 +137,7 @@ class UserInfoDal(FaUserInfo):
                     parentId = parentEnt.ID # 用于下次添加的时候
                     in_ent.parentArr[i]["K"]=parentId # 用于更新，该记录是谁添加和修改的
 
-        return AppReturnDTO(False, "暂不开放注册")
+        return AppReturnDTO(True)
 
     def FinishUserInfoAndLogin(self, userId, loginName, password, name,
                                level_id, sex, YEARS_TYPE, BIRTHDAY_TIME,

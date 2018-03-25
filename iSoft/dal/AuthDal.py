@@ -37,8 +37,4 @@ class AuthDal(FaLogin):
         '''退出登录'''
         return AppReturnDTO(True)
 
-    @staticmethod
-    def verify_auth_token(token):
-        '''验证token'''
-        return Fun.verify_auth_token(token)
 

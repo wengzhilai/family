@@ -15,6 +15,7 @@ from sqlalchemy import or_, and_, create_engine
 from iSoft import db
 from iSoft.entity.model import FaUser, FaModule
 from iSoft.dal.LoginDal import LoginDal
+from iSoft.dal.AuthDal import AuthDal
 import datetime
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
 import json
@@ -93,7 +94,7 @@ class UserDal(FaUser):
         in_ent.__dict__ = _inent
         if in_ent.loginName is None or in_ent.loginName == '':
             return AppReturnDTO(False, "用户名不能为空")
-        if in_ent.password is None or in_ent.password == '':
+        if in_ent.passWord is None or in_ent.passWord == '':
             return AppReturnDTO(False, "密码不能为空")
 
         login = FaLogin.query.filter_by(LOGIN_NAME=in_ent.loginName).first()
@@ -101,7 +102,7 @@ class UserDal(FaUser):
         if user is None or login is None:
             return AppReturnDTO(False, "用户名有误")
 
-        if login.PASSWORD != Fun.md5(in_ent.password):
+        if login.PASSWORD != Fun.md5(in_ent.passWord):
             return AppReturnDTO(False, "密码有误")
 
         tmp = UserDal()
@@ -116,7 +117,7 @@ class UserDal(FaUser):
 
         tmp.moduleList = json.loads(
             json.dumps(moduleIdList, cls=AlchemyEncoder))
-        token = LoginDal.generate_auth_token(tmp)
+        token = AuthDal.generate_auth_token(tmp)
         token = token.decode('utf-8')
         return AppReturnDTO(True, "登录成功", tmp, token)
     
