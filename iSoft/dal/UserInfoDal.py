@@ -55,7 +55,7 @@ class UserInfoDal(FaUserInfo):
             relistNew.append(tmp)
         return relistNew, AppReturnDTO(True)
 
-    def userInfo_register(self, _inDict):
+    def userInforegister(self, _inDict):
         '''
         注册用户
         用于APP注册

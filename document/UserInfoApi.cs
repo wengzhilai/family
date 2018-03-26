@@ -229,7 +229,6 @@ namespace ProServer.ApiWeb
                 reEnt.ItemList.Add(nowInfo);
                 AddFatherItem(reEnt.ItemList, userInfo, 1, 2, new XYZ { X = nowInfo.x, Y = nowInfo.y, Z = userInfo.fa_user_info1.Count() }, tmpXY[0], tmpXY[1]);
 
-
                 var minX = reEnt.ItemList.Min(x => x.x);
                 var minY = reEnt.ItemList.Max(x => x.y);
                 minY = -minY;

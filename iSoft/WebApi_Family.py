@@ -22,5 +22,7 @@ def ApiFamilyUserInfoRelative():
     if g is None:
         return Fun.class_to_JsonStr(AppReturnDTO(False, "没有登录"))
     dal=FamilyDal()
-    ent,msg= dal.UserInfoRelative(g.current_user.ID)
-    return Fun.class_to_JsonStr(msg)
+    re_ent,message= dal.UserInfoRelative(g.current_user.ID)
+    if message.IsSuccess:
+        message.Data=re_ent.__dict__
+    return Fun.class_to_JsonStr(message)
