@@ -35,13 +35,13 @@ class UserInfoDal(FaUserInfo):
         return relist, is_succ
 
     def userInfo_delete(self, key):
-        is_succ = Fun.model_delete(FaUserInfo, key)
-        return is_succ, is_succ
+        delMode,is_succ = Fun.model_delete(FaUserInfo, key)
+        return delMode,is_succ
 
     def userInfo_single(self, key):
         '''查询一用户'''
-        relist, is_succ = Fun.model_single(FaUserInfo, key)
-        return relist, is_succ
+        is_succ = Fun.model_single(FaUserInfo, key)
+        return is_succ
 
     def userInfo_SingleByName(self, name):
         relist = FaUserInfo.query.filter(

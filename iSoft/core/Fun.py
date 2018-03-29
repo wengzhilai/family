@@ -137,12 +137,14 @@ class Fun(object):
 
     @staticmethod
     def model_delete(model, key):
-        delSql = 'delete from {0} where ID IN ({1})'.format(
-            model.__tablename__, key)
-        print(delSql)
-        db.session.execute(delSql)
-        db.session.commit()
-        return AppReturnDTO(True)
+        '删除记录，并返回删除的条数'
+        try:
+            delMode = model.query.filter(model.ID == key).delete(synchronize_session=False)
+            db.session.commit()
+            return delMode,AppReturnDTO(True)
+        except:
+            return None,AppReturnDTO(False,'删除失败')
+        
 
     @staticmethod
     def model_single(model, key):

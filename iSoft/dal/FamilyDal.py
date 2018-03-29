@@ -66,7 +66,7 @@ class FamilyDal(object):
             nowI= myPlace+i
             x = inAxisXY.X+(i*2)
             maxX = x if i==len(sonList) else maxX
-            item = self.UserInfoToRelativeItem(sonList[nowI], inAxisXY.X, inAxisXY.Y)
+            item = self.UserInfoToRelativeItem(sonList[nowI], x, inAxisXY.Y)
             mainList.append(item)
 
         # 添加父亲
