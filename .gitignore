@@ -6,3 +6,5 @@ search.db
 flask
 venv
 iSoft/download
+.vscode/launch.json
+.vscode/settings.json
