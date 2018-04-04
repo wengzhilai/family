@@ -12,7 +12,7 @@ import random  # 生成随机数
 from iSoft.model.framework.RequestSaveModel import RequestSaveModel
 import iSoft.core.LunarDate
 import time
-
+import os
 
 @app.route('/Api/Public/SendCode', methods=['GET', 'POST'])
 def ApiPublicSendCode():
@@ -34,7 +34,7 @@ def ApiPublicSendCode():
     code = random.randint(1000, 9999)
     dal = LoginDal()
     re_ent = dal.UpdateCode(postEnt.Data["phoneNum"], code)
-    re_ent.Data=code
+    re_ent.Data = code
     return json.dumps(Fun.convert_to_dict(re_ent))
 
 
@@ -68,3 +68,14 @@ def ApiPublicGetSolarDate():
     reStr = iSoft.core.LunarDate.LunarDate.fromSolarDate(y, m, d)
     reStr = "{0}-{1}-{2}".format(reStr.year, reStr.month, reStr.day)
     return Fun.class_to_JsonStr(AppReturnDTO(True, reStr))
+
+
+@app.route('/Api/Public/upload', methods=['POST', 'GET'])
+def ApiPublicUpload():
+    if request.method == 'POST':
+        f = request.files['file']
+        basepath = os.path.dirname(__file__)
+        upload_path=os.path.join(basepath,"static\\uploads",f.filename)
+        f.save(upload_path)
+        return redirect(url_for('upload'))
+    return render_template('upload.html')

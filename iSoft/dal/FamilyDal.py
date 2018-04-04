@@ -12,11 +12,11 @@ class FamilyDal(object):
             return None, AppReturnDTO(False, "用户不存在")
         reEnt = Relative()
 
-        nowPlace, msg = self.AddSonItem(reEnt.ItemList, userInfoEnt, 1, 4,
+        nowPlace, msg = self.AddSonItem(reEnt.ItemList, userInfoEnt, 1, 7,
                                         AxisXY(0, 0))
 
         item = self.UserInfoToRelativeItem(userInfoEnt, nowPlace.Between(), 0)
-        msg = self.AddFatherItem(reEnt.ItemList, userInfoEnt, 1, 4,AxisXY(0, 0))
+        msg = self.AddFatherItem(reEnt.ItemList, userInfoEnt, 1, 4,AxisXY(nowPlace.Between(), 0))
 
         reEnt.ItemList.append(item)
         
@@ -31,11 +31,11 @@ class FamilyDal(object):
                 item.y=item.y-minY
 
 
-
+        allUserId=[item.Id for item in reEnt.ItemList]
         reEnt.RelativeList = [{
             "K": item.Id,
             "V": item.FatherId
-        } for item in reEnt.ItemList if item.FatherId is not None]
+        } for item in reEnt.ItemList if item.FatherId is not None and item.FatherId in allUserId]
         reEnt.FormatItemList()
         return reEnt, AppReturnDTO(True)
 
@@ -52,23 +52,26 @@ class FamilyDal(object):
         myPlace = 0;
         myPlace=max(index for index in range(len(sonList)) if sonList[index].ID == inSon.ID)
 
-        minX=0
-        maxX=0
+        brotherXList=[]
+
+        # 添加自己
+        brotherXList.append(inAxisXY.X)
         #比传入用的值小的兄弟
         for i in range(0,myPlace):
             nowI= myPlace-i
             x = inAxisXY.X-((i+1)*2)
-            minX = x if i==0 else minX
+            brotherXList.append(x)
             item = self.UserInfoToRelativeItem(sonList[nowI-1], x, inAxisXY.Y)
             mainList.append(item)
         # 添加比传入大的兄弟
         for i in range(1,len(sonList)-myPlace):
             nowI= myPlace+i
             x = inAxisXY.X+(i*2)
-            maxX = x if i==len(sonList) else maxX
+            brotherXList.append(x)
             item = self.UserInfoToRelativeItem(sonList[nowI], x, inAxisXY.Y)
             mainList.append(item)
-
+        minX=min(brotherXList)
+        maxX=max(brotherXList)
         # 添加父亲
         mainList.append(self.UserInfoToRelativeItem(father,  (minX+maxX)/2 , inAxisXY.Y-1))
  
@@ -96,29 +99,28 @@ class FamilyDal(object):
             return reEnt, AppReturnDTO(True)
 
         startX = inAxisXY.X
-        #最大的X
-        maxX = 0
-
         # 循环所有子项，子项从小到大
         allChildren = sorted(inFather.fa_user_infos, key=lambda x: x.LEVEL_ID)
-
+        allChildXList=[]
         for index, son in enumerate(allChildren):
             #获取子项的
-            nowHorizonVal, msg = self.AddSonItem(mainList, son, 1, 4,
+            nowHorizonVal, msg = self.AddSonItem(mainList, son, levelId+1, maxLevelId,
                                                  AxisXY(
                                                      startX, inAxisXY.Y + 1))
+
             # 该值会传入入下一项兄弟项，加2是因为每个项间隔都是2，在除的时候，才会有整数
             startX = nowHorizonVal.AllMaxHorizon if nowHorizonVal.AllMaxHorizon > nowHorizonVal.RowMaxHorizon + 2 else nowHorizonVal.RowMaxHorizon + 2
             #获取所有子项的中间值
             thisItemX = nowHorizonVal.Between()
-            # 获取该子项最大的X
-            maxX = thisItemX if thisItemX > maxX else maxX
+            # 保存所有子项的X坐标
+            allChildXList.append(thisItemX)
 
             item = self.UserInfoToRelativeItem(son, thisItemX, inAxisXY.Y + 1)
             mainList.append(item)
 
-        reEnt.AllMaxHorizon = startX if startX > maxX else maxX
-        reEnt.RowMaxHorizon = maxX
+        reEnt.RowMaxHorizon = max(allChildXList)
+        reEnt.RowMinHorizon = min(allChildXList)
+        reEnt.AllMaxHorizon = startX if startX > reEnt.RowMaxHorizon else reEnt.RowMaxHorizon
         return reEnt, AppReturnDTO(True)
 
     def UserInfoToRelativeItem(self, faUserInfo, x, y):
