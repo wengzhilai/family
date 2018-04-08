@@ -14,6 +14,7 @@ import iSoft.core.LunarDate
 import time
 import os
 
+
 @app.route('/Api/Public/SendCode', methods=['GET', 'POST'])
 def ApiPublicSendCode():
     '''
@@ -73,9 +74,11 @@ def ApiPublicGetSolarDate():
 @app.route('/Api/Public/upload', methods=['POST', 'GET'])
 def ApiPublicUpload():
     if request.method == 'POST':
-        f = request.files['file']
+        f = request.files['uploadedfile']
         basepath = os.path.dirname(__file__)
-        upload_path=os.path.join(basepath,"static\\uploads",f.filename)
+        upload_path = os.path.join(basepath, "../static/uploads", f.filename)
         f.save(upload_path)
-        return redirect(url_for('upload'))
-    return render_template('upload.html')
+        reEnt = AppReturnDTO(True)
+        reEnt.Data = {"NAME": f.filename}
+        return Fun.class_to_JsonStr(reEnt)
+    return Fun.class_to_JsonStr(AppReturnDTO(False))
