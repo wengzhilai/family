@@ -13,6 +13,10 @@ The sqlite database must also be created before the application can run, and the
 Running
 -------
 
+pip3 install virtualenv
+
+export PATH=$PATH/:/Library/Frameworks/Python.framework/Versions/3.6/bin
+
 virtualenv -p python3 --no-site-packages venv
 virtualenv --no-site-packages venv
 

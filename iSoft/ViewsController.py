@@ -66,7 +66,8 @@ def view_export():
 
 @app.route("/download/<path:filename>")
 def downloader(filename):
-    dirpath = os.path.join(app.root_path, 'download')
+    '查看static下所有文件'
+    dirpath = os.path.join(app.root_path, '../static')
     return send_from_directory(dirpath, filename, as_attachment=True)
 
 

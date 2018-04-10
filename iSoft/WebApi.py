@@ -4,6 +4,7 @@ from iSoft.core.Fun import Fun
 from iSoft import auth, login_manager, app
 from flask import request, flash, g
 from iSoft.dal.LoginDal import LoginDal
+from iSoft.dal.FileDal import FileDal
 import iSoft.entity.model
 from iSoft.model.AppReturnDTO import AppReturnDTO
 from iSoft.core.AlchemyEncoder import AlchemyEncoder
@@ -11,6 +12,7 @@ import json
 import random  # 生成随机数
 from iSoft.model.framework.RequestSaveModel import RequestSaveModel
 import iSoft.core.LunarDate
+import datetime
 import time
 import os
 
@@ -72,13 +74,26 @@ def ApiPublicGetSolarDate():
 
 
 @app.route('/Api/Public/upload', methods=['POST', 'GET'])
+@auth.login_required
 def ApiPublicUpload():
+    if g == None:
+        return Fun.class_to_JsonStr(AppReturnDTO(False,"重新登录"))
     if request.method == 'POST':
-        f = request.files['uploadedfile']
+        f = request.files['file']
         basepath = os.path.dirname(__file__)
         upload_path = os.path.join(basepath, "../static/uploads", f.filename)
         f.save(upload_path)
-        reEnt = AppReturnDTO(True)
-        reEnt.Data = {"NAME": f.filename}
-        return Fun.class_to_JsonStr(reEnt)
+        addFile = {
+            "NAME": f.filename,
+            "URL": 'download/uploads/{0}'.format(f.filename),
+            "PATH":upload_path,
+            "USER_ID":g.current_user.ID,
+            "LENGTH":len(f.read()),
+            "UPLOAD_TIME":datetime.datetime.now(),
+            }
+        dal=FileDal()
+        re_ent,message=dal.file_Save(addFile,[])
+        if message.IsSuccess:
+            message.set_data(re_ent)
+        return Fun.class_to_JsonStr(message)
     return Fun.class_to_JsonStr(AppReturnDTO(False))
